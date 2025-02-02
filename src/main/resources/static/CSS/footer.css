@@ -1,0 +1,39 @@
+.footer {
+    background-color: #343a40; /* Dark background color */
+    padding: 10px 5px; /* Reduced padding */
+    color: white; /* White text for contrast */
+    position: fixed; /* Fixed position */
+    bottom: 0; /* Stick to the bottom */
+    width: 100%; /* Full width */
+    display: flex; /* Flexbox for alignment */
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Vertically center the content */
+}
+
+
+
+.footer .social-icons {
+    display: flex;
+}
+
+.footer .social-icons a {
+    margin: 0 5px;
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 50%;
+    background-color: white; /* White background for icons */
+    color: #343a40; /* Dark icon color */
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.footer .social-icons a:hover {
+    background-color: #0056b3; /* Highlight color on hover */
+    color: white; /* White icon on hover */
+}
+
+.footer .copyright {
+    color: white; /* Ensure copyright text is visible */
+}

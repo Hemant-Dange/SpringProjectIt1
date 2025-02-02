@@ -1,0 +1,111 @@
+.login-container {
+  margin-top: 140px;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+}
+.image-container img {
+  transition: transform 0.3s;
+}
+.image-container img:hover {
+  transform: scale(1.1);
+}
+.font-weight-bold {
+  color: #007bff;
+  font-size: 1.2rem;
+}
+
+/* Dynamically adding login form */
+
+.tenant-login-form {
+  margin-top: 30px;
+}
+
+.tenant-login-form .card {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tenant-login-form h3 {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.tenant-login-form .form-control {
+  border-radius: 10px;
+  box-shadow: none;
+  border: 1px solid #ced4da;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tenant-login-form .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.tenant-login-form .btn-primary {
+  background-color: #007bff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.tenant-login-form .btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.tenant-login-form .invalid-feedback {
+  font-size: 0.9rem;
+  color: #dc3545;
+  display: block;
+}
+
+.tenant-login-trigger {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.tenant-login-trigger:hover {
+  transform: scale(1.1);
+}
+
+/* Add margin-top to center the forms visually */
+.tenant-login-form,
+.manager-login-form {
+  margin-top: 100px; /* Adjust as needed for vertical centering */
+}
+
+@media (max-height: 800px) {
+    .tenant-login-form,
+    .manager-login-form {
+        margin-top: 50px; /* Smaller margin for shorter screens */
+    }
+}
+
+.back-to-main {
+    background-color: #dc3545; /* Bootstrap's danger red */
+    color: #fff;
+    width: 150px; /* Reduced width */
+    margin: 10px auto; /* Center the button horizontally */
+    display: block; /* Ensure it behaves like a block-level element for centering */
+    text-align: center;
+    border: none; /* Remove border */
+    border-radius: 5px; /* Slightly rounded corners */
+    padding: 10px 0; /* Adjust padding */
+    font-size: 1rem; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.back-to-main:hover {
+    background-color: #bd2130; /* Darker red for hover */
+}
+
+.divBox{
+  margin-bottom: 100px;
+}
+

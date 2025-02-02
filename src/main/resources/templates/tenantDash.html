@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/CSS/login.css}">
+    <link rel="stylesheet" th:href="@{/CSS/footer.css}">
+    <link rel="stylesheet" th:href="@{/CSS/index.css}">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" th:href="@{/}">
+            <img th:src="@{Images/hhLogo-removebg-preview.png}" style="height: 50px;" alt="HappyHomes">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contactus}">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h3 class="text-center">Welcome, <span th:text="${tenantUsername}"></span></h3>
+        <p class="text-center">Select your desired room and dates below:</p>
+
+        <!-- ✅ Display Allocated Room if Approved -->
+        <h2 class="text-center text-success" th:if="${allocatedRoom}">
+            You have been allocated Room No. <span th:text="${allocatedRoom}"></span>
+        </h2>
+
+        <!-- Available Rooms Section -->
+        <h4 class="mt-5 text-center">Available Rooms</h4>
+        <table class="table table-bordered mt-3">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Room Number</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="room : ${rooms}">
+                    <td th:text="${room.roomNo}"></td>
+                    <td th:text="${room.type ? 'AC' : 'Non-AC'}"></td>
+                    <td th:text="${room.status ? 'Occupied' : 'Vacant'}"></td>
+                    <td>
+                        <form th:if="${!room.status}" th:action="@{/tenant/book-room/{roomNo}(roomNo=${room.roomNo})}"
+                            method="post">
+                            <div class="form-row">
+                                <div class="col">
+                                    <label>Check-in Date:</label>
+                                    <input type="date" name="checkin" class="form-control" required>
+                                </div>
+                                <div class="col">
+                                    <label>Check-out Date:</label>
+                                    <input type="date" name="checkout" class="form-control" required>
+                                </div>
+                                <div class="col mt-4">
+                                    <button type="submit" class="btn btn-success">Book</button>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(rooms)}">
+                    <td colspan="4" class="text-center">No rooms available</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

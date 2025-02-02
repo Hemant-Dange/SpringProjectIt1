@@ -1,0 +1,185 @@
+/* Styling for the room grid container */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* General styling for room blocks */
+.room {
+    padding: 20px;
+    border-radius: 50%; /* Make the rooms appear round */
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+/* Vacant room styling */
+.vacant {
+    background-color: green;
+}
+
+/* Occupied room styling */
+.occupied {
+    background-color: red;
+}
+
+/* Hover effect for rooms */
+.room:hover {
+    opacity: 0.8;
+    transform: scale(1.1); /* Slight zoom-in effect */
+}
+
+/* Table styling for the booking log */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: navy;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Navbar customization */
+.navbar-dark {
+    background-color: navy;
+}
+
+.navbar-brand {
+    color: white !important;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+}
+
+/* Footer styles */
+footer {
+    margin-top: 30px;
+    background-color: navy;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+footer a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.cancel-booking {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.cancel-booking:hover {
+    opacity: 0.8;
+}
+
+/* Styling for the "Cancelled" status */
+td#status- {
+    color: gray;
+    font-weight: bold;
+}
+
+/* Container for Rooms */
+#roomGridContainer {
+    padding: 20px;
+    border: 2px solid #007bff; /* Blue border for the box */
+    border-radius: 10px;
+    background-color: #f8f9fa; /* Light gray background */
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Available Room Button Styles */
+.room {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    line-height: 100px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.room.vacant {
+    background-color: #28a745; /* Green for vacant */
+}
+
+.room.occupied {
+    background-color: #dc3545; /* Red for occupied */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.room:hover:not(.occupied) {
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Selected Room */
+.room.selected {
+    border: 3px solid #ffc107; /* Yellow border for selected */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Add margin to the bottom of the log table */
+#bookingLog {
+    margin-bottom: 20px; /* Adjust value as needed */
+}
+
+/* Add margin to the log table container */
+.mt-5 {
+    margin-bottom: 20px; /* Adjust value as needed */
+}
+
+/* Add more spacing to the room grid container */
+#roomGridContainer {
+    margin-bottom: 100px; /* Increased space below the container */
+}
+
+/* Optional: Style for #roomGrid for a cleaner layout */
+#roomGrid {
+    padding: 15px; /* Adds spacing inside the grid */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; /* Space between rooms */
+}
+
+.room.selected {
+    border: 3px solid #ffc107; /* Yellow border for selected */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+  }

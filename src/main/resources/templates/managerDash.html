@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/CSS/footer.css}">
+    <link rel="stylesheet" th:href="@{/CSS/managerDash.css}">
+    <link rel="stylesheet" th:href="@{/CSS/index.css}">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" th:href="@{/}"><img th:src="@{/Images/hhLogo-removebg-preview.png}" style="height: 50px;" alt="HappyHomes"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/manage-rooms}">Manage Rooms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger" th:href="@{/manager/logout}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center">Welcome, <span th:text="${managerName}"></span></h2>
+        <p class="text-center">Manage bookings and tenants below:</p>
+
+        <!-- Booking Management Section -->
+        <h3 class="mt-4">Pending Bookings</h3>
+        <table class="table table-bordered mt-3">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Tenant ID</th>
+                    <th>Room No</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="booking : ${bookings}">
+                    <td th:text="${booking.id}"></td>
+                    <td th:text="${booking.userId}"></td>
+                    <td th:text="${booking.roomNo}"></td>
+                    <td th:text="${booking.checkinDate}"></td>
+                    <td th:text="${booking.checkoutDate}"></td>
+                    <td>
+                        <form th:action="@{/manager/approve-booking/{id}(id=${booking.id})}" method="post">
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                        <form th:action="@{/manager/reject-booking/{id}(id=${booking.id})}" method="post">
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(bookings)}">
+                    <td colspan="6" class="text-center">No pending bookings</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="footer">
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <div class="copyright">
+            &copy; 2025 Hostel Management System. All rights reserved.
+        </div>
+    </footer>
+
+</body>
+</html>

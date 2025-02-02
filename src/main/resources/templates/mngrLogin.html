@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Manager Login - Hostel Management System</title>
+
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/CSS/login.css}">
+	<link rel="stylesheet" th:href="@{/CSS/footer.css}">
+	<link rel="stylesheet" th:href="@{/CSS/index.css}">
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" th:href="@{/}"><img th:src="@{/Images/hhLogo-removebg-preview.png}" style="height: 50px;"
+				alt="HappyHomes"></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/}">Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/contactus}">Contact Us</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/register}">Register</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<!-- Manager Login Form -->
+	<div class="container manager-login-form divBox" style="margin-top: 120px;">
+		<div class="card p-4 shadow">
+			<h3 class="text-center mb-4">Manager Login</h3>
+
+			<!-- Display error message if login fails -->
+			<div th:if="${error}" class="alert alert-danger text-center" role="alert">
+				<span th:text="${error}"></span>
+			</div>
+
+			<form id="managerLoginForm" method="post" th:action="@{/manager/login}">
+				<div class="form-group">
+					<label for="manager-email">Email</label>
+					<input type="email" id="manager-email" name="email" class="form-control"
+						placeholder="Enter your email" required>
+				</div>
+				<div class="form-group">
+					<label for="manager-password">Password</label>
+					<input type="password" id="manager-password" name="password" class="form-control"
+						placeholder="Enter your password" required>
+				</div>
+				<button type="submit" class="btn btn-primary btn-block">Login</button>
+			</form>
+			<a class="btn btn-secondary btn-block back-to-main" th:href="@{/login}">Back</a>
+		</div>
+	</div>
+
+	<footer class="footer">
+		<div class="social-icons">
+			<a href="#"><i class="fab fa-facebook-f"></i></a>
+			<a href="#"><i class="fab fa-twitter"></i></a>
+			<a href="#"><i class="fab fa-instagram"></i></a>
+		</div>
+		<div class="copyright">
+			&copy; 2025 Hostel Management System. All rights reserved.
+		</div>
+	</footer>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script th:src="@{/JS/login.js}"></script>
+
+</body>
+
+</html>
