@@ -11,6 +11,53 @@
     <link rel="stylesheet" th:href="@{/CSS/login.css}">
     <link rel="stylesheet" th:href="@{/CSS/footer.css}">
     <link rel="stylesheet" th:href="@{/CSS/index.css}">
+    <style>
+        /* ✅ Hide the booking form initially */
+        .booking-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* ✅ Centered Room Allocation Message */
+        .room-allocated-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .room-allocated {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb); /* Gradient Green */
+            border-radius: 15px; /* Rounded Corners */
+            padding: 20px;
+            box-shadow: 5px 5px 15px rgba(0, 128, 0, 0.2); /* Subtle 3D Shadow */
+            width: auto;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* ✅ Beautiful Text for Success Message */
+        .room-allocated-text {
+            color: #155724; /* Dark Green */
+            font-weight: bold;
+            font-size: 22px;
+            font-family: "Poppins", sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 100, 0, 0.3); /* Soft Text Shadow */
+        }
+
+        /* ✅ Fade-in Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -49,59 +96,102 @@
             </button>
         </div>
 
-        <p class="text-center">Select your desired room and dates below:</p>
-
         <!-- ✅ Display Allocated Room if Approved -->
-        <h2 class="text-center text-success" th:if="${allocatedRoom}">
-            You have been allocated Room No. <span th:text="${allocatedRoom}"></span>
-        </h2>
+        <div class="room-allocated-container">
+            <div th:if="${allocatedRoom}" class="room-allocated text-center">
+                <h2 class="room-allocated-text">
+                    🎉 Congratulations! You have been allocated <br> 
+                    <strong>Room No. <span th:text="${allocatedRoom}"></span></strong>
+                </h2>
+            </div>
+        </div>
 
-        <!-- Available Rooms Section -->
-        <h4 class="mt-5 text-center">Available Rooms</h4>
-        <table class="table table-bordered mt-3">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Room Number</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="room : ${rooms}">
-                    <td th:text="${room.roomNo}"></td>
-                    <td th:text="${room.type ? 'AC' : 'Non-AC'}"></td>
-                    <td th:text="${room.status ? 'Occupied' : 'Vacant'}"></td>
-                    <td>
-                        <form th:if="${!room.status}" th:action="@{/tenant/book-room/{roomNo}(roomNo=${room.roomNo})}"
-                            method="post">
-                            <div class="form-row">
-                                <div class="col">
-                                    <label>Check-in Date:</label>
-                                    <input type="date" name="checkin" class="form-control" required>
-                                </div>
-                                <div class="col">
-                                    <label>Check-out Date:</label>
-                                    <input type="date" name="checkout" class="form-control" required>
-                                </div>
-                                <div class="col mt-4">
-                                    <button type="submit" class="btn btn-success">Book</button>
-                                </div>
-                            </div>
-                        </form>
-                    </td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(rooms)}">
-                    <td colspan="4" class="text-center">No rooms available</td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- ✅ Hide Booking Table & Text if Room is Allocated -->
+        <div th:if="${allocatedRoom == null}">
+            <p class="text-center">Select your desired room and dates below:</p>
+
+            <!-- Available Rooms Section -->
+            <h4 class="mt-5 text-center">Available Rooms</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Room Number</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="room : ${rooms}">
+                            <td th:text="${room.roomNo}"></td>
+                            <td th:text="${room.type ? 'AC' : 'Non-AC'}"></td>
+                            <td>
+                                <span th:text="${room.status ? 'Occupied' : 'Vacant'}" 
+                                      th:class="${room.status ? 'text-danger' : 'text-success'}">
+                                </span>
+                            </td>
+                            <td>
+                                <button th:if="${!room.status}" class="btn btn-primary select-room-btn"
+                                    th:data-room-no="${room.roomNo}">
+                                    Select
+                                </button>
+
+                                <!-- ✅ Booking Form (Initially Hidden) -->
+                                <form th:id="'booking-form-' + ${room.roomNo}" class="booking-form"
+                                    th:action="@{/tenant/book-room/{roomNo}(roomNo=${room.roomNo})}" method="post">
+                                    <div class="form-group">
+                                        <label>Check-in Date:</label>
+                                        <input type="date" name="checkin" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Check-out Date:</label>
+                                        <input type="date" name="checkout" class="form-control" required>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-success">Book</button>
+                                        <button type="button" class="btn btn-danger cancel-btn">Cancel</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(rooms)}">
+                            <td colspan="4" class="text-center text-muted">No rooms available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- ✅ Include Bootstrap JavaScript for Dismissable Alerts -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+	
+	<footer class="footer text-center">
+		    <div class="copyright">
+		        &copy; 2025 Hostel Management System. All rights reserved.
+		    </div>
+		</footer>
+    <!-- ✅ JavaScript to Toggle Booking Form -->
+    <script>
+        $(document).ready(function () {
+            $(".select-room-btn").click(function () {
+                let roomNo = $(this).attr("data-room-no");
+                $("#booking-form-" + roomNo).slideDown();
+                $(this).hide();
+            });
+
+            $(".cancel-btn").click(function () {
+                let form = $(this).closest(".booking-form");
+                form.slideUp();
+                form.siblings(".select-room-btn").show();
+            });
+        });
+    </script>
+	
 
 </body>
 

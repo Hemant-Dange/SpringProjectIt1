@@ -1,182 +1,202 @@
 /* General Styles */
 body {
-    padding-top: 80px; /* Push content below navbar */
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+	padding-top: 80px;
+	/* Push content below navbar */
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
 
 /* Buttons */
 .btn-book {
-    background-color: #007bff;
-    color: #fff;
-    font-size: 1.2rem;
-    padding: 10px 20px;
-    border-radius: 25px;
-    transition: background-color 0.3s, transform 0.3s;
+	background-color: #007bff;
+	color: #fff;
+	font-size: 1.2rem;
+	padding: 10px 20px;
+	border-radius: 25px;
+	transition: background-color 0.3s, transform 0.3s;
 }
 
 .btn-book:hover {
-    background-color: #0056b3;
-    transform: scale(1.1);
+	background-color: #0056b3;
+	transform: scale(1.1);
 }
 
 /* Navbar */
 .navbar {
-    background-color: #ffffff;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Thicker shadow */
-    padding: 15px 20px;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 70px;
-    z-index: 1000;
+	background-color: #ffffff;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+	/* Thicker shadow */
+	padding: 15px 20px;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 70px;
+	z-index: 1000;
 }
 
 .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #007bff;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #007bff;
 }
 
 .navbar-brand:hover {
-    color: #0056b3;
+	color: #0056b3;
 }
 
 .navbar-nav .nav-link {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #343a40;
-    transition: color 0.3s ease-in-out;
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: #343a40;
+	transition: color 0.3s ease-in-out;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #007bff;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+	color: #007bff;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-toggler {
-    border: 1px solid #007bff;
-    border-radius: 4px;
+	border: 1px solid #007bff;
+	border-radius: 4px;
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 123, 255, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 123, 255, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .navbar-nav .nav-link {
-    color: grey !important;
+	color: black !important;
 }
 
 /* Hero Image Section (Fixed Background with Blur Effect) */
 #heroImage {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 680px;
-    z-index: -1;
-    background-color: #000; /* Fallback background */
-    overflow: hidden;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 680px;
+	z-index: -1;
+	background-color: #000;
+	/* Fallback background */
+	overflow: hidden;
 }
 
 /* Hero Image */
 .hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.5s ease-in-out; /* Smooth blur effect */
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: filter 0.5s ease-in-out;
+	/* Smooth blur effect */
 }
 
 /* Blur the hero image when scrolling */
 .scrolled #heroImage .hero-img {
-    filter: blur(8px);
+	filter: blur(8px);
 }
 
 /* Sections */
 .services-section {
-    margin-top: 700px; /* Adjusted to prevent overlap */
-    background: rgba(255, 255, 255, 0.3); /* Slight opacity for better text visibility */
-    backdrop-filter: blur(5px); /* Glassmorphism effect */
-    padding: 50px 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    z-index: 0; /* Allows footer to overlap */
-    transition: transform 0.5s ease-in-out;
+	margin-top: 700px;
+	/* Adjusted to prevent overlap */
+	background: rgba(255, 255, 255, 0.3);
+	/* Slight opacity for better text visibility */
+	backdrop-filter: blur(5px);
+	/* Glassmorphism effect */
+	padding: 50px 20px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+	position: relative;
+	z-index: 0;
+	/* Allows footer to overlap */
+	transition: transform 0.5s ease-in-out;
 }
 
 /* Improve text readability */
-.services-section h2, 
-.services-section h3, 
+.services-section h2,
+.services-section h3,
 .services-section p {
-    color: #222;
-    font-weight: bold;
-    text-shadow: 0.3px 0.3px 0.7px rgba(255, 255, 255, 0.8); /* Subtle text glow */
+	color: #222;
+	font-weight: bold;
+	text-shadow: 0.3px 0.3px 0.7px rgba(255, 255, 255, 0.8);
+	/* Subtle text glow */
 }
 
 /* Service Items */
 .service-item {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .service-item h3 {
-    font-size: 1.5rem;
-    color: #0066ff;
+	font-size: 1.5rem;
+	color: #0066ff;
 }
 
 .service-item p {
-    font-size: 1rem;
-    color: #333; /* Adjusted for better contrast */
+	font-size: 1rem;
+	color: #333;
+	/* Adjusted for better contrast */
 }
 
 /* Footer */
 .footer {
-    background-color: #343a40;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    width: 100%;
-    position: relative;
-    z-index: 10; /* Keeps footer on top */
+	background-color: #343a40;
+	color: white;
+	padding: 20px;
+	text-align: center;
+	width: 100%;
+	position: relative;
+	z-index: 10;
+	/* Keeps footer on top */
 }
 
 /* Push footer to the bottom */
 main {
-    flex: 1;
-    position: relative;
-    z-index: 1; /* Keeps content below footer */
+	flex: 1;
+	position: relative;
+	z-index: 1;
+	/* Keeps content below footer */
 }
 
-/* Keep the carousel fixed at the top */
-#carouselExample {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: -1;
-    transition: filter 0.5s ease-in-out; /* Smooth transition */
-}
+
 
 /* Blur the carousel when scrolling */
 .scrolled #carouselExample {
-    filter: blur(8px);
+	filter: blur(8px);
 }
 
 /* Animation: Initially hidden */
 .animate {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+	opacity: 0;
+	transform: translateY(50px);
+	transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 /* Animation: When visible */
 .animate.visible {
-    opacity: 1;
-    transform: translateY(0);
+	opacity: 1;
+	transform: translateY(0);
 }
 
 /* Ensure the body has enough space so content does not overlap */
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+/* ✅ Center Footer Text */
+.footer {
+	width: 100%;
+	background-color: #343a40;
+	/* Dark background color */
+	padding: 15px;
+	position: fixed;
+	bottom: 0;
+	text-align: center;
+	font-weight: bold;
+	font-size: 14px;
+	box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+	/* Subtle Top Shadow */
 }
