@@ -51,11 +51,11 @@ public class ManagerController {
             return "redirect:/manager/login"; // Redirect to login if not logged in
         }
 
-        // Fetch pending bookings
+        // ✅ Fetch only PENDING bookings (so rejected ones disappear)
         List<Booking> pendingBookings = managerService.getPendingBookings();
         model.addAttribute("bookings", pendingBookings);
 
-        // Fetch all tenants
+        // ✅ Fetch all tenants
         List<Tenant> tenants = managerService.getAllTenants();
         model.addAttribute("tenants", tenants);
 
@@ -65,8 +65,13 @@ public class ManagerController {
 
     // ✅ Approve Booking
     @PostMapping("/approve-booking/{bookingId}")
-    public String approveBooking(@PathVariable Long bookingId) {
-        managerService.approveBooking(bookingId);
+    public String approveBooking(@PathVariable Long bookingId, Model model) {
+        try {
+            managerService.approveBooking(bookingId);
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            return "managerDash"; // Return to dashboard with error message
+        }
         return "redirect:/manager/dashboard";
     }
 

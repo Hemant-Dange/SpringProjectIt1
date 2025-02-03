@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Service
 public class ManagerService {
- 
+
     @Autowired
     private ManagerRepository managerRepository;
 
@@ -45,42 +45,67 @@ public class ManagerService {
         return tenantRepository.findAll();
     }
 
-    // ✅ Fetch pending bookings
+    // ✅ Fetch only PENDING bookings (So REJECTED ones disappear)
     public List<Booking> getPendingBookings() {
         return bookingRepository.findByRequestStatus("PENDING");
     }
 
-    // ✅ Approve booking & update room status
+    // ✅ Approve booking & update room status (Ensures tenant has only one booking)
     public void approveBooking(Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
         if (optionalBooking.isPresent()) {
             Booking booking = optionalBooking.get();
+            Tenant tenant = booking.getTenant();
+            Room room = booking.getRoom();
+
+            // 🚀 Check if tenant already has an approved booking
+            if (bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED") != null) {
+                throw new IllegalStateException("Tenant already has an approved booking!");
+            }
+
+            // ✅ Approve booking and update status
             booking.setRequestStatus("APPROVED");
             bookingRepository.save(booking);
 
-            // Fetch and update room status
-            Optional<Room> optionalRoom = roomRepository.findById(booking.getRoomNo());
-            if (optionalRoom.isPresent()) {
-                Room room = optionalRoom.get();
-                room.setStatus(true); // Set room as occupied
-                roomRepository.save(room);
-            }
+            // ✅ Update room status to occupied
+            room.setStatus(true);
+            roomRepository.save(room);
         }
     }
 
-    // ✅ Reject booking request
+    // ✅ Reject booking request (update status only, do NOT update room status)
     public void rejectBooking(Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
         if (optionalBooking.isPresent()) {
             Booking booking = optionalBooking.get();
+
+            // ✅ Mark the booking as REJECTED (Do NOT change room status)
             booking.setRequestStatus("REJECTED");
             bookingRepository.save(booking);
         }
     }
 
+    // ✅ Delete tenant and update room status
+    public void deleteTenant(Long tenantId) {
+        Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
+        if (tenantOptional.isPresent()) {
+            Tenant tenant = tenantOptional.get();
+
+            // ✅ Fetch the tenant's active booking safely
+            Booking activeBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
+            if (activeBooking != null) {
+                Room room = activeBooking.getRoom();
+                room.setStatus(false); // Make room vacant
+                roomRepository.save(room);
+            }
+
+            // ✅ Delete tenant (cascade deletes their booking)
+            tenantRepository.delete(tenant);
+        }
+    }
+
     // ✅ Add a new room
     public void addRoom(int roomNo, boolean type) {
-        // Ensure room does not already exist
         if (!roomRepository.existsById(roomNo)) {
             roomRepository.save(new Room(roomNo, type, false)); // New room is vacant
         }

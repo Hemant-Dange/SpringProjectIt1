@@ -4,8 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pgms.pgmanage.dto.TenantDto;
+import com.pgms.pgmanage.entity.Booking;
 import com.pgms.pgmanage.entity.Tenant;
 import com.pgms.pgmanage.repository.TenantRepository;
+import com.pgms.pgmanage.repository.BookingRepository;
+
+import java.util.Optional;
 
 @Service
 public class TenantService {
@@ -13,50 +17,67 @@ public class TenantService {
     @Autowired
     private TenantRepository tenantRepo;
 
-    // ✅ Tenant Registration (Without Password Hashing)
-    public boolean registerTenant(TenantDto tenantDto) {
-        // Check if email already exists
-        if (tenantRepo.findBytMail(tenantDto.gettMail()) != null) {
-            return false; // Email is already registered
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    // ✅ Tenant Registration (With Uniqueness Checks)
+    public String registerTenant(TenantDto tenantDto) {
+        // ✅ Check if email already exists
+        if (tenantRepo.existsByTMail(tenantDto.gettMail())) {
+            return "Email is already registered!";
         }
 
-        // Create a new Tenant entity
+        // ✅ Check if username already exists
+        if (tenantRepo.existsByUsername(tenantDto.getUsername())) {
+            return "Username is already taken!";
+        }
+
+        // ✅ Check if phone number already exists
+        if (tenantRepo.existsByPhNumber(tenantDto.getPhNumber())) {
+            return "Phone number is already registered!";
+        }
+
+        // ✅ Check if passwords match
+        if (!tenantDto.getPassword().equals(tenantDto.getConPassword())) {
+            return "Passwords do not match!";
+        }
+
+        // ✅ Create Tenant entity (Ensure `conPassword` is not used)
         Tenant tenant = new Tenant();
         tenant.setUsername(tenantDto.getUsername());
         tenant.settMail(tenantDto.gettMail());
         tenant.setPhNumber(tenantDto.getPhNumber());
+        tenant.setPassword(tenantDto.getPassword()); // ✅ Only saving password
 
-        // Storing passwords as plain text (⚠️ Security risk, consider hashing in the future)
-        tenant.setPassword(tenantDto.getPassword());
-        tenant.setConPassword(tenantDto.getConPassword());
-
-        // Save to database
+        // ✅ Save tenant without validating `conPassword`
         tenantRepo.save(tenant);
 
-        return true; // Registration successful
+        return "Registration Successful!";
     }
 
     // ✅ Tenant Login (Simple Email & Password Comparison)
     public TenantDto authenticateTenant(String email, String password) {
-        // Find tenant by email
-        Tenant tenant = tenantRepo.findBytMail(email);
+        Tenant tenant = tenantRepo.findByTMail(email);
 
-        // Check if tenant exists and password matches
         if (tenant != null && tenant.getPassword().equals(password)) {
-            // ✅ Create a new TenantDto object with only necessary fields
+            // ✅ Return only necessary fields
             TenantDto tenantDto = new TenantDto();
             tenantDto.setUsername(tenant.getUsername());
             tenantDto.settMail(tenant.gettMail());
             tenantDto.setPhNumber(tenant.getPhNumber());
-            return tenantDto; // Returning only required fields
+            return tenantDto;
         }
 
         return null; // Authentication failed
     }
-    
-    public boolean authenticateTenant(TenantDto tenantDto) {
-        Tenant tenant = tenantRepo.findBytMail(tenantDto.gettMail());
 
-        return tenant != null && tenant.getPassword().equals(tenantDto.getPassword());
+    // ✅ Prevent Multiple Bookings Per User
+    public boolean canBookRoom(Long tenantId) {
+        Optional<Tenant> tenant = tenantRepo.findById(tenantId);
+        if (tenant.isPresent()) {
+            Booking existingBooking = bookingRepository.findByTenantId(tenantId);
+            return existingBooking == null; // Can book only if no existing booking
+        }
+        return false;
     }
 }

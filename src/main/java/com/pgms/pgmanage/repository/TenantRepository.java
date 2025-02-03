@@ -6,5 +6,22 @@ import com.pgms.pgmanage.entity.Tenant;
 
 @Repository
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
-    Tenant findBytMail(String email); // Find tenant by email
+
+    // ✅ Find tenant by email
+    Tenant findByTMail(String tMail);  
+
+    // ✅ Find tenant by username
+    Tenant findByUsername(String username);
+
+    // ✅ Find tenant by phone number
+    Tenant findByPhNumber(Long phNumber);
+
+    // ✅ Check if email exists (for validation during registration)
+    boolean existsByTMail(String tMail);
+
+    // ✅ Check if username exists (for validation during registration)
+    boolean existsByUsername(String username);
+
+    // ✅ Check if phone number exists (for validation during registration)
+    boolean existsByPhNumber(Long phNumber);
 }

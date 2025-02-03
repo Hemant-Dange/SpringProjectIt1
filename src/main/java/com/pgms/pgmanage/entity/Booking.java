@@ -11,8 +11,13 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId; // Tenant ID
-    private int roomNo; // Room Number(make it unique)
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true) // 🚀 One-to-One mapping with Tenant
+    private Tenant tenant; // Each booking is linked to a single tenant
+
+    @ManyToOne
+    @JoinColumn(name = "room_no", nullable = false) // 🚀 Many bookings can refer to one room
+    private Room room;
 
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
@@ -22,33 +27,37 @@ public class Booking {
     public Booking() {}
 
     // ✅ Parameterized Constructor
-    public Booking(Long userId, int roomNo, LocalDate checkinDate, LocalDate checkoutDate, String requestStatus) {
-        this.userId = userId;
-        this.roomNo = roomNo;
+    public Booking(Tenant tenant, Room room, LocalDate checkinDate, LocalDate checkoutDate, String requestStatus) {
+        this.tenant = tenant;
+        this.room = room;
         this.checkinDate = checkinDate;
         this.checkoutDate = checkoutDate;
         this.requestStatus = requestStatus;
     }
 
-    // ✅ Getters and Setters
+    // ✅ Getters & Setters
     public Long getId() {
         return id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public Tenant getTenant() {
+        return tenant;
     }
 
-    public int getRoomNo() {
-        return roomNo;
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 
-    public void setRoomNo(int roomNo) {
-        this.roomNo = roomNo;
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public LocalDate getCheckinDate() {
@@ -77,8 +86,8 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "Booking [id=" + id + ", userId=" + userId + ", roomNo=" + roomNo +
-                ", checkinDate=" + checkinDate + ", checkoutDate=" + checkoutDate +
-                ", requestStatus=" + requestStatus + "]";
+        return "Booking [id=" + id + ", tenant=" + tenant + ", room=" + room + 
+               ", checkinDate=" + checkinDate + ", checkoutDate=" + checkoutDate + 
+               ", requestStatus=" + requestStatus + "]";
     }
 }

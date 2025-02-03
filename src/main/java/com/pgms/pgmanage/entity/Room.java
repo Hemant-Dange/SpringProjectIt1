@@ -1,8 +1,7 @@
 package com.pgms.pgmanage.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "rooms")
@@ -14,6 +13,10 @@ public class Room {
     private boolean type; // true = AC, false = Non-AC
     private boolean status; // true = Occupied, false = Vacant
 
+    // ✅ One-to-Many Relationship: A Room can have multiple Bookings
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings;
+
     // ✅ Default Constructor
     public Room() {}
 
@@ -24,7 +27,7 @@ public class Room {
         this.status = status;
     }
 
-    // ✅ Getters and Setters
+    // ✅ Getters & Setters
     public int getRoomNo() {
         return roomNo;
     }
@@ -49,8 +52,17 @@ public class Room {
         this.status = status;
     }
 
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
     @Override
     public String toString() {
-        return "Room [roomNo=" + roomNo + ", type=" + (type ? "AC" : "Non-AC") + ", status=" + (status ? "Occupied" : "Vacant") + "]";
+        return "Room [roomNo=" + roomNo + ", type=" + (type ? "AC" : "Non-AC") + 
+               ", status=" + (status ? "Occupied" : "Vacant") + "]";
     }
 }

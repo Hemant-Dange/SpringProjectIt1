@@ -26,16 +26,17 @@ public class LoginController {
     // ✅ Process Tenant Login
     @PostMapping("/tenantlogin")
     public String tenantLogin(@ModelAttribute TenantDto tenantDto, Model model, HttpSession session) {
-        boolean isValidTenant = tenantService.authenticateTenant(tenantDto);
+        // ✅ Authenticate Tenant
+        TenantDto authenticatedTenant = tenantService.authenticateTenant(tenantDto.gettMail(), tenantDto.getPassword());
 
-        if (!isValidTenant) {
+        if (authenticatedTenant == null) {
             model.addAttribute("error", "Invalid email or password. Please try again.");
             return "tenantLogin"; // Stay on login page if credentials are incorrect
         }
 
-        // Store tenant information in session
-        session.setAttribute("loggedInTenant", tenantDto.gettMail());
-        session.setAttribute("tenantUsername", tenantDto.getUsername());
+        // ✅ Store tenant information in session
+        session.setAttribute("loggedInTenant", authenticatedTenant.gettMail());
+        session.setAttribute("tenantUsername", authenticatedTenant.getUsername());
 
         return "redirect:/tenant/dashboard"; // Redirect to dashboard on successful login
     }
