@@ -107,9 +107,18 @@ public class ManagerService {
 
     // ✅ Add a new room
     public void addRoom(int roomNo, boolean type) {
-        if (!roomRepository.existsById(roomNo)) {
-            roomRepository.save(new Room(roomNo, type, false)); // New room is vacant
+        // Check if the room number is negative
+        if (roomNo < 1) {
+            throw new IllegalArgumentException("Room number must be a positive number!");
         }
+
+        // Check if the room already exists
+        if (roomRepository.existsById(roomNo)) {
+            throw new IllegalStateException("Room number " + roomNo + " already exists!");
+        }
+
+        // Create and save the new room if valid
+        roomRepository.save(new Room(roomNo, type, false));  // Default status is Vacant
     }
 
     // ✅ Remove a room and associated bookings in one transaction

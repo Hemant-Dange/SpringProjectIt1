@@ -111,10 +111,26 @@ public class ManagerController {
 
 	// ✅ Add Room
 	@PostMapping("/add-room")
-	public String addRoom(@RequestParam int roomNo, @RequestParam boolean type) {
-		managerService.addRoom(roomNo, type);
-		return "redirect:/manager/manage-rooms";
+	public String addRoom(@RequestParam int roomNo, @RequestParam boolean type, RedirectAttributes redirectAttributes) {
+	    try {
+	        // Call the service to add the room
+	        managerService.addRoom(roomNo, type);
+	        redirectAttributes.addFlashAttribute("message", "Room added successfully!");
+	    } catch (IllegalArgumentException e) {
+	        // Handle the case where the room number is negative or invalid
+	        redirectAttributes.addFlashAttribute("error", e.getMessage());
+	    } catch (IllegalStateException e) {
+	        // Handle the case where the room number already exists
+	        redirectAttributes.addFlashAttribute("error", e.getMessage());
+	    } catch (Exception e) {
+	        // Catch any other unexpected exceptions
+	        redirectAttributes.addFlashAttribute("error", "An unexpected error occurred: " + e.getMessage());
+	    }
+	    return "redirect:/manager/manage-rooms";  // Redirect back to the Manage Rooms page
 	}
+
+
+
 
 	// ✅ Remove Room and display success message
 	@PostMapping("/remove-room")

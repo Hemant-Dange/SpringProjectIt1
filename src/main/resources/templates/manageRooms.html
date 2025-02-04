@@ -144,13 +144,13 @@
         <p class="text-center">View and manage rooms below:</p>
 
         <!-- Display success or error message -->
-        <div th:if="${message}" class="alert alert-success">
-            <p th:text="${message}"></p> <!-- Display success message -->
-        </div>
-        
-        <div th:if="${error}" class="alert alert-danger">
-            <p th:text="${error}"></p> <!-- Display error message -->
-        </div>
+		<div th:if="${message}" class="alert alert-success">
+		    <p th:text="${message}"></p> <!-- Display success message -->
+		</div>
+
+		<div th:if="${error}" class="alert alert-danger">
+		    <p th:text="${error}"></p> <!-- Display error message -->
+		</div>
 
         <!-- Room List -->
         <h3 class="mt-4">Room List</h3>
@@ -177,7 +177,7 @@
             <form th:action="@{/manager/add-room}" method="post">
                 <div class="form-group">
                     <label>Room Number:</label>
-                    <input type="number" name="roomNo" class="form-control" required>
+                    <input type="number" name="roomNo" class="form-control" required min="1">
                 </div>
                 <div class="form-group">
                     <label>Type:</label>
