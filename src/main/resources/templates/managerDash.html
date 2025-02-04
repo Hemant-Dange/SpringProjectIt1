@@ -10,6 +10,102 @@
     <link rel="stylesheet" href="/CSS/footer.css">
     <link rel="stylesheet" href="/CSS/managerDash.css">
     <link rel="stylesheet" href="/CSS/index.css">
+    
+    <!-- Custom Styles to Improve Button and Table Effects -->
+    <style>
+        /* Add 3D Effect to Buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px); /* Lift the button */
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        /* Ensure Table Looks 3D */
+        .table {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .table td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        /* Hover effect for table rows */
+        .table tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        /* Table Row Styling */
+        .table tr {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Show Alert for Error */
+        .alert {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer Styling */
+        .footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .social-icons a {
+            margin: 0 10px;
+            font-size: 20px;
+        }
+
+        .content {
+            min-height: 100vh;
+            padding-bottom: 70px; /* Give some space at the bottom for the footer */
+        }
+    </style>
 </head>
 
 <body>
@@ -34,11 +130,11 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-5 content">
         <h2 class="text-center">Welcome, <span th:text="${managerName}"></span></h2>
         <p class="text-center">Manage bookings and tenants below:</p>
 
-        <!-- ✅ Display Error Message if Approval Fails -->
+        <!-- Display Error Message if Approval Fails -->
         <div th:if="${error}" class="alert alert-danger text-center alert-dismissible fade show" role="alert">
             <p th:text="${error}"></p>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -60,7 +156,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- ✅ Ensure bookings list is not empty before looping -->
+                <!-- Ensure bookings list is not empty before looping -->
                 <tr th:if="${bookings != null and not #lists.isEmpty(bookings)}" 
                     th:each="booking : ${bookings}">
                     
@@ -70,16 +166,16 @@
                     <td th:text="${booking?.checkinDate ?: 'N/A'}"></td>
                     <td th:text="${booking?.checkoutDate ?: 'N/A'}"></td>
                     <td>
-                        <form th:if="${booking?.id}" th:action="@{/manager/approve-booking/{id}(id=${booking.id})}" method="post">
+                        <form th:if="${booking?.id}" th:action="@{/manager/approve-booking/{id}(id=${booking.id})}" method="post" class="d-inline-block">
                             <button type="submit" class="btn btn-success">Approve</button>
                         </form>
-                        <form th:if="${booking?.id}" th:action="@{/manager/reject-booking/{id}(id=${booking.id})}" method="post">
+                        <form th:if="${booking?.id}" th:action="@{/manager/reject-booking/{id}(id=${booking.id})}" method="post" class="d-inline-block ml-2">
                             <button type="submit" class="btn btn-danger">Reject</button>
                         </form>
                     </td>
                 </tr>
 
-                <!-- ✅ Show this row if there are no bookings -->
+                <!-- Show this row if there are no bookings -->
                 <tr th:if="${#lists.isEmpty(bookings)}">
                     <td colspan="6" class="text-center">No pending bookings</td>
                 </tr>
@@ -93,10 +189,11 @@
         </div>
     </footer>
 
-    <!-- ✅ Include Bootstrap JavaScript for Dismissable Alerts -->
+    <!-- Include Bootstrap JavaScript for Dismissable Alerts -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
+
 </html>
