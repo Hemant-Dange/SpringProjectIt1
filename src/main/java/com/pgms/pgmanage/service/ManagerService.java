@@ -2,6 +2,7 @@ package com.pgms.pgmanage.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;  // Importing the annotation
 import com.pgms.pgmanage.entity.Manager;
 import com.pgms.pgmanage.entity.Booking;
 import com.pgms.pgmanage.entity.Room;
@@ -111,10 +112,29 @@ public class ManagerService {
         }
     }
 
-    // ✅ Remove a room
+    // ✅ Remove a room and associated bookings in one transaction
+    @Transactional
     public void removeRoom(int roomNo) {
-        if (roomRepository.existsById(roomNo)) {
-            roomRepository.deleteById(roomNo);
+        Optional<Room> roomOptional = roomRepository.findById(roomNo);
+        if (roomOptional.isPresent()) {
+            Room room = roomOptional.get();
+
+            // ✅ If the room is occupied, we need to handle booking deletion
+            if (room.isStatus()) {
+                List<Booking> bookings = room.getBookings();
+                for (Booking booking : bookings) {
+                    Tenant tenant = booking.getTenant();
+                    // 🚀 Remove booking reference from tenant
+                    tenant.setBooking(null); // Remove booking reference
+                    tenantRepository.save(tenant);
+
+                    // 🚀 Delete the booking
+                    bookingRepository.delete(booking);
+                }
+            }
+
+            // ✅ Now we can safely delete the room
+            roomRepository.delete(room);
         }
     }
 }

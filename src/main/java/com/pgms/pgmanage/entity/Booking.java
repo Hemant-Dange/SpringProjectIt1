@@ -12,21 +12,21 @@ public class Booking {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true) // 🚀 One-to-One mapping with Tenant
+    @JoinColumn(name = "user_id", nullable = false, unique = true) // One-to-One mapping with Tenant
     private Tenant tenant; // Each booking is linked to a single tenant
 
     @ManyToOne
-    @JoinColumn(name = "room_no", nullable = false) // 🚀 Many bookings can refer to one room
+    @JoinColumn(name = "room_no", nullable = false) // Many bookings can refer to one room
     private Room room;
 
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
     private String requestStatus; // PENDING, APPROVED, REJECTED
 
-    // ✅ Default Constructor
+    // Default Constructor
     public Booking() {}
 
-    // ✅ Parameterized Constructor
+    // Parameterized Constructor
     public Booking(Tenant tenant, Room room, LocalDate checkinDate, LocalDate checkoutDate, String requestStatus) {
         this.tenant = tenant;
         this.room = room;
@@ -35,7 +35,7 @@ public class Booking {
         this.requestStatus = requestStatus;
     }
 
-    // ✅ Getters & Setters
+    // Getters & Setters
     public Long getId() {
         return id;
     }

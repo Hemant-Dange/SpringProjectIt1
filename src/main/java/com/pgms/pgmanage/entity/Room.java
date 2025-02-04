@@ -14,7 +14,7 @@ public class Room {
     private boolean status; // true = Occupied, false = Vacant
 
     // ✅ One-to-Many Relationship: A Room can have multiple Bookings
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true) 
     private List<Booking> bookings;
 
     // ✅ Default Constructor
