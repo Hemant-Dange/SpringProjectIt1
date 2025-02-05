@@ -12,7 +12,7 @@
     <link rel="stylesheet" th:href="@{/CSS/footer.css}">
     <link rel="stylesheet" th:href="@{/CSS/index.css}">
     <style>
-        /* Ensure footer stays at the bottom */
+        /* Footer at the bottom of the page */
         .footer {
             position: relative;
             bottom: 0;
@@ -28,112 +28,30 @@
             font-size: 20px;
         }
 
-        /* Ensure the page content doesn't go behind the footer */
         .content {
             min-height: 100vh;
-            padding-bottom: 70px; /* Give some space at the bottom for the footer */
+            padding-bottom: 70px; /* Space at the bottom for the footer */
         }
 
-        /* Table Styling for 3D effect */
-        .table {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Table Header Styling */
-        .table th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-
-        /* Table Row Styling */
-        .table tr {
-            transition: background-color 0.3s ease;
-        }
-
-        /* Table Row Hover Effect */
-        .table tr:hover {
-            background-color: rgba(0, 123, 255, 0.1);
-        }
-
-        /* Table Data Cells Styling */
-        .table td {
-            padding: 12px;
-            vertical-align: middle;
-        }
-
-        /* Table Border Styling */
-        .table-bordered {
-            border: 1px solid #dee2e6;
-        }
-
-        /* Table Bottom Border */
-        .table th, .table td {
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        /* Table Hover Effect for Better User Experience */
-        .table th:hover {
-            cursor: pointer;
-            background-color: #0056b3;
-        }
-
-        /* 3D effect for Add Room Form */
-        .form-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Add hover effect for the form */
-        .form-container:hover {
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Add some input field styling */
-        .form-group input, .form-group select {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Add more rounded buttons */
-        .btn {
-            border-radius: 8px;
-            padding: 10px 20px;
-        }
-
-        /* Custom Style for Room Allocation Message */
         .room-allocated {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb); /* Gradient Green */
-            border-radius: 15px; /* Rounded Corners */
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 5px 5px 15px rgba(0, 128, 0, 0.2); /* Subtle 3D Shadow */
+            box-shadow: 5px 5px 15px rgba(0, 128, 0, 0.2);
             width: auto;
             max-width: 500px;
             text-align: center;
             animation: fadeIn 1s ease-in-out;
+            margin: 0 auto; /* Center the message horizontally */
         }
 
-        /* Text Styling for Success Message */
         .room-allocated-text {
-            color: #155724; /* Dark Green */
+            color: #155724;
             font-weight: bold;
             font-size: 22px;
             font-family: "Poppins", sans-serif;
-            text-shadow: 1px 1px 3px rgba(0, 100, 0, 0.3); /* Soft Text Shadow */
         }
 
-        /* Fade-in Animation */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -145,10 +63,16 @@
             }
         }
 
-        /* Initially hide the booking form */
         .booking-form {
             display: none;
             margin-top: 10px;
+        }
+
+        .table {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
         }
     </style>
 </head>
@@ -163,13 +87,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contactus}">Contact Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/logout}">Logout</a>
+                    <a class="nav-link btn btn-danger" th:href="@{/logout}">Logout</a>
                 </li>
             </ul>
         </div>
@@ -178,9 +96,25 @@
     <div class="container mt-5 content">
         <h3 class="text-center">Welcome, <span th:text="${tenantUsername}"></span></h3>
 
+        <!-- Display Success Message for Booking Request -->
+        <div th:if="${bookingSuccessMessage}" class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            <p th:text="${bookingSuccessMessage}"></p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
         <!-- Display Error Message if Tenant Tries to Book Again -->
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center" role="alert">
             <p th:text="${error}"></p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <!-- Display Rejection Message -->
+        <div th:if="${bookingRejectionMessage}" class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+            <p th:text="${bookingRejectionMessage}"></p>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -196,7 +130,7 @@
             </div>
         </div>
 
-        <!-- Hide Booking Table & Text if Room is Allocated -->
+        <!-- Booking Section (Only if Room is Not Allocated) -->
         <div th:if="${allocatedRoom == null}">
             <p class="text-center">Select your desired room and dates below:</p>
 

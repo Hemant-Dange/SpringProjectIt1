@@ -1,19 +1,21 @@
 package com.pgms.pgmanage.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;  // Importing the annotation
-import com.pgms.pgmanage.entity.Manager;
-import com.pgms.pgmanage.entity.Booking;
-import com.pgms.pgmanage.entity.Room;
-import com.pgms.pgmanage.entity.Tenant;
-import com.pgms.pgmanage.repository.ManagerRepository;
-import com.pgms.pgmanage.repository.BookingRepository;
-import com.pgms.pgmanage.repository.RoomRepository;
-import com.pgms.pgmanage.repository.TenantRepository;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.pgms.pgmanage.entity.Booking;
+import com.pgms.pgmanage.entity.Manager;
+import com.pgms.pgmanage.entity.Room;
+import com.pgms.pgmanage.entity.Tenant;
+import com.pgms.pgmanage.repository.BookingRepository;
+import com.pgms.pgmanage.repository.ManagerRepository;
+import com.pgms.pgmanage.repository.RoomRepository;
+import com.pgms.pgmanage.repository.TenantRepository;
 
 @Service
 public class ManagerService {
@@ -86,7 +88,7 @@ public class ManagerService {
         }
     }
 
-    // ✅ Delete tenant and update room status
+    // ✅ Delete tenant and update room status (make room available again)
     public void deleteTenant(Long tenantId) {
         Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
         if (tenantOptional.isPresent()) {
@@ -145,5 +147,39 @@ public class ManagerService {
             // ✅ Now we can safely delete the room
             roomRepository.delete(room);
         }
+    }
+
+    // ✅ Logic to handle tenant booking (Check if already booked)
+    public String bookRoom(Long tenantId, int roomNo, String checkinDate, String checkoutDate) {
+        Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
+        if (tenantOptional.isEmpty()) {
+            throw new IllegalStateException("Tenant not found!");
+        }
+
+        Tenant tenant = tenantOptional.get();
+
+        // ✅ Check if the tenant already has an approved booking
+        Booking existingBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
+        if (existingBooking != null) {
+            return "You are already occupying a room. You can't request another booking until your current one is resolved.";
+        }
+
+        // ✅ Proceed with booking logic
+        Room room = roomRepository.findById(roomNo).orElse(null);
+        if (room == null || room.isStatus()) {
+            return "Selected room is not available.";
+        }
+
+        // Create new booking request
+        Booking booking = new Booking();
+        booking.setTenant(tenant);
+        booking.setRoom(room);
+        booking.setCheckinDate(LocalDate.parse(checkinDate));
+        booking.setCheckoutDate(LocalDate.parse(checkoutDate));
+        booking.setRequestStatus("PENDING");
+
+        bookingRepository.save(booking);
+
+        return "Booking request sent successfully!";
     }
 }

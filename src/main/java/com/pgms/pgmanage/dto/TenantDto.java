@@ -1,6 +1,12 @@
 package com.pgms.pgmanage.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 
 public class TenantDto {
 
@@ -12,7 +18,7 @@ public class TenantDto {
     private String tMail;
 
     @NotNull(message = "Phone number is required")
-    @Min(value = 1000000000, message = "Phone number must be exactly 10 digits")
+    @Min(value = 6000000000L, message = "Phone number must be exactly 10 digits")
     @Max(value = 9999999999L, message = "Phone number must be exactly 10 digits")
     private Long phNumber;
 

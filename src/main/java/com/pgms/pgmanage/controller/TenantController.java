@@ -55,10 +55,22 @@ public class TenantController {
             model.addAttribute("allocatedRoom", approvedBooking.getRoom().getRoomNo()); // Pass allocated room to frontend
         }
 
+        // ✅ Show rejection message (if any)
+        if (session.getAttribute("bookingRejectionMessage") != null) {
+            model.addAttribute("bookingRejectionMessage", session.getAttribute("bookingRejectionMessage"));
+            session.removeAttribute("bookingRejectionMessage"); // Remove after displaying
+        }
+
         // ✅ Pass booking error messages if any
         if (session.getAttribute("bookingError") != null) {
             model.addAttribute("bookingError", session.getAttribute("bookingError"));
             session.removeAttribute("bookingError"); // Remove after displaying
+        }
+
+        // ✅ Success message for booking request
+        if (session.getAttribute("bookingSuccessMessage") != null) {
+            model.addAttribute("bookingSuccessMessage", session.getAttribute("bookingSuccessMessage"));
+            session.removeAttribute("bookingSuccessMessage"); // Remove after displaying
         }
 
         return "tenantDash"; // Load tenant dashboard
@@ -84,10 +96,10 @@ public class TenantController {
             return "redirect:/tenantlogin"; // Redirect if tenant not found
         }
 
-        // ✅ Check if the tenant already has a booking
-        Booking existingBooking = bookingRepository.findByTenantId(tenant.getId());
+        // ✅ Check if the tenant already has an approved booking
+        Booking existingBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
         if (existingBooking != null) {
-            model.addAttribute("error", "You can send only one booking request at a time.");
+            model.addAttribute("error", "You already have an approved booking. You can’t request a new room until your current booking is resolved.");
             return tenantDashboard(session, model); // ✅ Return the tenant dashboard with the error message
         }
 
@@ -98,7 +110,7 @@ public class TenantController {
             return tenantDashboard(session, model); // ✅ Return the tenant dashboard with the error message
         }
 
-        // ✅ Save Booking
+        // ✅ Save Booking (Request Status: PENDING)
         Booking booking = new Booking();
         booking.setTenant(tenant);
         booking.setRoom(room);
@@ -108,7 +120,28 @@ public class TenantController {
 
         bookingRepository.save(booking);
 
-        return "redirect:/tenant/dashboard"; // Redirect after successful booking
+        // ✅ Set success message for booking request
+        session.setAttribute("bookingSuccessMessage", "Booking request sent successfully!");
+
+        return "redirect:/tenant/dashboard"; // Redirect to the tenant dashboard after booking
     }
+
+    // ✅ Handle Rejected Booking
+    @PostMapping("/reject-booking/{bookingId}")
+    public String rejectBooking(@PathVariable Long bookingId, HttpSession session) {
+        // Fetch booking by ID
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking != null) {
+            // Change the booking status to REJECTED
+            booking.setRequestStatus("REJECTED");
+            bookingRepository.save(booking);
+
+            // Set rejection message for tenant dashboard
+            session.setAttribute("bookingRejectionMessage", "Your previous booking request was rejected. You can now request a new room.");
+        }
+
+        return "redirect:/tenant/dashboard"; // Redirect back to the tenant dashboard
+    }
+    
 
 }

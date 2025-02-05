@@ -45,6 +45,6 @@ public class LoginController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // Clear session
-        return "redirect:/contactus"; // Redirect after logout
+        return "redirect:/tenantlogin"; // Redirect after logout
     }
 }
