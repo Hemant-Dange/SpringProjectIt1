@@ -135,24 +135,19 @@ public class ManagerController {
 	// ✅ Remove Room and display success message
 	@PostMapping("/remove-room")
 	public String removeRoom(@RequestParam int roomNo, RedirectAttributes redirectAttributes) {
-		try {
-			// Call the service to remove the room and handle associated bookings
-			managerService.removeRoom(roomNo);
-			redirectAttributes.addFlashAttribute("message", "Room and associated bookings removed successfully!"); // Add
-																													// success
-																													// message
-																													// as
-																													// flash
-																													// attribute
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", "Error while removing the room. Please try again!"); // Add
-																												// error
-																												// message
-																												// as
-																												// flash
-																												// attribute
-		}
-		return "redirect:/manager/manage-rooms"; // Redirect back to the manage rooms page
+	    try {
+	        // ✅ Call service to remove the room and handle associated bookings
+	        managerService.removeRoom(roomNo);
+	        redirectAttributes.addFlashAttribute("message", "Room and associated bookings removed successfully!");
+	        
+	    } catch (IllegalStateException e) { // ✅ Handle occupied room case
+	        redirectAttributes.addFlashAttribute("error", "You cannot delete this room as it is occupied by a tenant.");
+	        
+	    } catch (Exception e) { // ✅ Handle other exceptions
+	        redirectAttributes.addFlashAttribute("error", "An error occurred while deleting the room.");
+	    }
+	    return "redirect:/manager/manage-rooms"; // Redirect back to manage rooms page
 	}
+
 
 }

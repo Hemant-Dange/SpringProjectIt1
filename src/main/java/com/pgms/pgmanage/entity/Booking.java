@@ -11,9 +11,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true) // One-to-One mapping with Tenant
-    private Tenant tenant; // Each booking is linked to a single tenant
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)  
+    private Tenant tenant; // A tenant can have multiple bookings
 
     @ManyToOne
     @JoinColumn(name = "room_no", nullable = false) // Many bookings can refer to one room

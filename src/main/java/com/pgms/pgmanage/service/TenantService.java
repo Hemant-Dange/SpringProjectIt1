@@ -1,6 +1,7 @@
 package com.pgms.pgmanage.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,7 @@ public class TenantService {
     }
 
     // ✅ Logic to handle booking request from tenant
+ // ✅ Logic to handle booking request from tenant
     public String requestBooking(Long tenantId, int roomNo, String checkinDate, String checkoutDate) {
         Optional<Tenant> tenantOptional = tenantRepo.findById(tenantId);
         if (tenantOptional.isEmpty()) {
@@ -97,10 +99,16 @@ public class TenantService {
 
         Tenant tenant = tenantOptional.get();
 
-        // ✅ Check if tenant has an active (approved) booking
-        Booking existingBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
+        // ✅ Check if tenant has any existing booking
+        Booking existingBooking = bookingRepository.findByTenantId(tenant.getId());
+
         if (existingBooking != null) {
-            return "You already have an active booking. You can’t request a new room until your current booking is resolved.";
+            if ("APPROVED".equals(existingBooking.getRequestStatus())) {
+                return "You already have an active booking. You can’t request a new room until your current booking is resolved.";
+            } else if ("REJECTED".equals(existingBooking.getRequestStatus())) {
+                // ❌ Remove the rejected booking before creating a new one
+                bookingRepository.delete(existingBooking);
+            }
         }
 
         // ✅ Fetch the room using roomNo
@@ -109,10 +117,10 @@ public class TenantService {
             return "Selected room is not available.";
         }
 
-        // Create and save the booking request (PENDING)
+        // ✅ Create and save the new booking request (PENDING)
         Booking booking = new Booking();
         booking.setTenant(tenant);
-        booking.setRoom(room);  // Now room is fetched from the repository
+        booking.setRoom(room);
         booking.setCheckinDate(LocalDate.parse(checkinDate));
         booking.setCheckoutDate(LocalDate.parse(checkoutDate));
         booking.setRequestStatus("PENDING");
@@ -121,5 +129,12 @@ public class TenantService {
 
         return "Booking request sent successfully!";
     }
+    
+    public boolean hasActiveBooking(Long tenantId) {
+        return bookingRepository.existsByTenantIdAndRequestStatusIn(
+            tenantId, List.of("PENDING", "APPROVED")
+        );
+    }
 
+    
 }

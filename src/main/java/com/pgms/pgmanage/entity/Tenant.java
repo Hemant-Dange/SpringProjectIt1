@@ -1,12 +1,14 @@
 package com.pgms.pgmanage.entity;
 
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -43,8 +45,12 @@ public class Tenant {
 	@Transient
 	private String conPassword;
 
-	@OneToOne(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Booking booking; // Ensures one user can have only one booking
+	@OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Booking> bookings;
+
+	public Tenant() {
+
+	}
 
 	public long getId() {
 		return id;
@@ -94,18 +100,12 @@ public class Tenant {
 		this.conPassword = conPassword;
 	}
 
-	public Booking getBooking() {
-		return booking;
+	public List<Booking> getBookings() {
+		return bookings;
 	}
 
-	public void setBooking(Booking booking) {
-		this.booking = booking;
-	}
-
-	@Override
-	public String toString() {
-		return "Tenant [id=" + id + ", username=" + username + ", tMail=" + tMail + ", phNumber=" + phNumber
-				+ ", password=" + password + ", conPassword=" + conPassword + ", booking=" + booking + "]";
+	public void setBookings(List<Booking> bookings) {
+		this.bookings = bookings;
 	}
 
 }

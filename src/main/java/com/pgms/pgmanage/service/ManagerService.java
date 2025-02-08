@@ -126,27 +126,23 @@ public class ManagerService {
     // ✅ Remove a room and associated bookings in one transaction
     @Transactional
     public void removeRoom(int roomNo) {
-        Optional<Room> roomOptional = roomRepository.findById(roomNo);
-        if (roomOptional.isPresent()) {
-            Room room = roomOptional.get();
-
-            // ✅ If the room is occupied, we need to handle booking deletion
-            if (room.isStatus()) {
-                List<Booking> bookings = room.getBookings();
-                for (Booking booking : bookings) {
-                    Tenant tenant = booking.getTenant();
-                    // 🚀 Remove booking reference from tenant
-                    tenant.setBooking(null); // Remove booking reference
-                    tenantRepository.save(tenant);
-
-                    // 🚀 Delete the booking
-                    bookingRepository.delete(booking);
-                }
-            }
-
-            // ✅ Now we can safely delete the room
-            roomRepository.delete(room);
+        Room room = roomRepository.findById(roomNo).orElse(null);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
         }
+
+        // ✅ Step 1: Check if room has any "APPROVED" bookings (i.e., occupied)
+        boolean isOccupied = bookingRepository.existsByRoomAndRequestStatus(room, "APPROVED");
+        if (isOccupied) {
+            throw new IllegalStateException("Cannot delete room as it is occupied by a tenant.");
+        }
+
+        // ✅ Step 2: Find and delete all bookings for the room
+        List<Booking> bookings = bookingRepository.findByRoom(room);
+        bookingRepository.deleteAll(bookings);
+
+        // ✅ Step 3: Delete the room
+        roomRepository.delete(room);
     }
 
     // ✅ Logic to handle tenant booking (Check if already booked)
