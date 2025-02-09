@@ -65,6 +65,9 @@ public class ManagerController {
 		// ✅ Fetch all tenants
 		List<Tenant> tenants = managerService.getAllTenants();
 		model.addAttribute("tenants", tenants);
+		
+		List<Booking> allBookings = managerService.getAllBookings();
+        model.addAttribute("allBookings", allBookings);
 
 		model.addAttribute("managerName", session.getAttribute("managerName"));
 		return "managerDash";

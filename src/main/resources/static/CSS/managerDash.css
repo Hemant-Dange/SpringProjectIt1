@@ -90,3 +90,8 @@
             min-height: 100vh;
             padding-bottom: 70px; /* Give some space at the bottom for the footer */
         }
+		
+		.table td, .table th {
+		    vertical-align: middle !important; /* Ensures vertical centering */
+		    text-align: center; /* Centers text */
+		}

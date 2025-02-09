@@ -22,4 +22,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByRoom(Room room);
 
     boolean existsByRoomAndRequestStatus(Room room, String requestStatus);
+    
+    List<Booking> findAllByOrderByIdDesc();
 }

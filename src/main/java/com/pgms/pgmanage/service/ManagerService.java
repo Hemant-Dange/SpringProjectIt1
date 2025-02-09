@@ -51,6 +51,10 @@ public class ManagerService {
 	public List<Booking> getPendingBookings() {
 		return bookingRepository.findByRequestStatus("PENDING");
 	}
+	
+	public List<Booking> getAllBookings() {
+        return bookingRepository.findAllByOrderByIdDesc(); // ✅ Fetch bookings in reverse order
+    }
 
 	// ✅ Approve booking & update room status (Ensures tenant has only one booking)
 	public void approveBooking(Long bookingId) {
