@@ -1,184 +1,92 @@
-/* Styling for the room grid container */
-.room-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
+/* Add 3D Effect to Buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-/* General styling for room blocks */
-.room {
-    padding: 20px;
-    border-radius: 50%; /* Make the rooms appear round */
-    text-align: center;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, opacity 0.2s;
-}
+        .btn:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px); /* Lift the button */
+        }
 
-/* Vacant room styling */
-.vacant {
-    background-color: green;
-}
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
 
-/* Occupied room styling */
-.occupied {
-    background-color: red;
-}
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
 
-/* Hover effect for rooms */
-.room:hover {
-    opacity: 0.8;
-    transform: scale(1.1); /* Slight zoom-in effect */
-}
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
 
-/* Table styling for the booking log and tenant information */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
 
-thead {
-    background-color: navy;
-    color: white;
-}
+        /* Ensure Table Looks 3D */
+        .table {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease-in-out;
+        }
 
-th, td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
 
-tr:hover {
-    background-color: #f1f1f1;
-}
+        .table td {
+            padding: 12px;
+            vertical-align: middle;
+        }
 
-/* Navbar customization */
-.navbar-dark {
-    background-color: navy;
-}
+        /* Hover effect for table rows */
+        .table tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
 
-.navbar-brand {
-    color: white !important;
-}
+        /* Table Row Styling */
+        .table tr {
+            transition: background-color 0.3s ease;
+        }
 
-.navbar-nav .nav-link {
-    color: white !important;
-}
+        /* Show Alert for Error */
+        .alert {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-/* Footer styles */
-footer {
-    margin-top: 30px;
-    background-color: navy;
-    color: white;
-    padding: 10px 0;
-    text-align: center;
-}
+        /* Footer Styling */
+        .footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+        }
 
-footer a {
-    color: white;
-    margin: 0 10px;
-    text-decoration: none;
-}
+        .social-icons a {
+            margin: 0 10px;
+            font-size: 20px;
+        }
 
-footer a:hover {
-    text-decoration: underline;
-}
-
-.cancel-booking {
-    background-color: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.cancel-booking:hover {
-    opacity: 0.8;
-}
-
-/* Styling for the "Cancelled" status */
-td#status- {
-    color: gray;
-    font-weight: bold;
-}
-
-/* Container for Rooms */
-#roomGridContainer {
-    padding: 20px;
-    border: 2px solid #007bff; /* Blue border for the box */
-    border-radius: 10px;
-    background-color: #f8f9fa; /* Light gray background */
-    margin: 20px auto;
-    max-width: 600px;
-    text-align: center;
-}
-
-/* Available Room Button Styles */
-.room {
-    width: 100px;
-    height: 100px;
-    margin: 10px;
-    display: inline-block;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    line-height: 100px;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.room.vacant {
-    background-color: #28a745; /* Green for vacant */
-}
-
-.room.occupied {
-    background-color: #dc3545; /* Red for occupied */
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.room:hover:not(.occupied) {
-    transform: scale(1.1);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Selected Room */
-.room.selected {
-    border: 3px solid #ffc107; /* Yellow border for selected */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Add margin to the bottom of the log table */
-#bookingLog {
-    margin-bottom: 20px; /* Adjust value as needed */
-}
-
-/* Add margin to the log table container */
-.mt-5 {
-    margin-bottom: 20px; /* Adjust value as needed */
-}
-
-/* Add more spacing to the room grid container */
-#roomGridContainer {
-    margin-bottom: 100px; /* Increased space below the container */
-}
-
-/* Optional: Style for #roomGrid for a cleaner layout */
-#roomGrid {
-    padding: 15px; /* Adds spacing inside the grid */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px; /* Space between rooms */
-}
-
-#tenInfo {
- margin-bottom: 120px;
-}
+        .content {
+            min-height: 100vh;
+            padding-bottom: 70px; /* Give some space at the bottom for the footer */
+        }

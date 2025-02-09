@@ -19,14 +19,12 @@ public class RegisterController {
 	@Autowired
 	private TenantService tenantService;
 
-	// ✅ Show Register Form
 	@GetMapping("/register")
 	public String showRegisterForm(Model model) {
 		model.addAttribute("tenantDto", new TenantDto());
 		return "register";
 	}
 
-	// ✅ Process Registration
 	@PostMapping("/register")
 	public String signUp(@Valid @ModelAttribute("tenantDto") TenantDto tenantDto, BindingResult result, Model model) {
 

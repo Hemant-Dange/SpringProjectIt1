@@ -1,37 +1,62 @@
-.navbar-nav .nav-link {
-    color: grey !important;
-}
+/* Footer at the bottom of the page */
+        .footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
 
-/* ✅ 3D Style for Allocated Room Message */
-.room-allocated {
-    background: linear-gradient(135deg, #d4edda, #c3e6cb); /* Gradient Green */
-    border-radius: 15px; /* Rounded Corners */
-    padding: 20px;
-    box-shadow: 5px 5px 15px rgba(0, 128, 0, 0.2); /* Subtle 3D Shadow */
-    display: inline-block;
-    width: auto;
-    max-width: 500px;
-    margin: auto;
-    animation: fadeIn 1s ease-in-out;
-}
+        .social-icons a {
+            margin: 0 10px;
+            font-size: 20px;
+        }
 
-/* ✅ Beautiful Text for Success Message */
-.room-allocated-text {
-    color: #155724; /* Dark Green */
-    font-weight: bold;
-    font-size: 22px;
-    font-family: "Poppins", sans-serif;
-    text-shadow: 1px 1px 3px rgba(0, 100, 0, 0.3); /* Soft Text Shadow */
-}
+        .content {
+            min-height: 100vh;
+            padding-bottom: 70px; /* Space at the bottom for the footer */
+        }
 
-/* ✅ Fade-in Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .room-allocated {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 5px 5px 15px rgba(0, 128, 0, 0.2);
+            width: auto;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+            margin: 0 auto; /* Center the message horizontally */
+        }
+
+        .room-allocated-text {
+            color: #155724;
+            font-weight: bold;
+            font-size: 22px;
+            font-family: "Poppins", sans-serif;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .booking-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .table {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+        }

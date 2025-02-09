@@ -27,25 +27,18 @@ public class BookingService {
     @Autowired
     private RoomRepository roomRepository;
 
-    /**
-     * ✅ Check if the tenant has an active booking.
-     */
+    
     public boolean hasActiveBooking(Long tenantId) {
         return bookingRepository.existsByTenantIdAndRequestStatusIn(
             tenantId, List.of("PENDING", "APPROVED")
         );
     }
 
-    /**
-     * ✅ Get approved booking for a tenant (if exists).
-     */
+    
     public Booking getApprovedBooking(Long tenantId) {
         return bookingRepository.findByTenantIdAndRequestStatus(tenantId, "APPROVED");
     }
 
-    /**
-     * ✅ Create a new booking request for a tenant.
-     */
     @Transactional
     public String requestBooking(Long tenantId, int roomNo, String checkinDate, String checkoutDate) {
         Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
@@ -54,7 +47,6 @@ public class BookingService {
         }
         Tenant tenant = tenantOptional.get();
 
-        // ✅ Check if the tenant has an existing booking
         Booking existingBooking = bookingRepository.findByTenantId(tenantId);
         if (existingBooking != null) {
             if ("APPROVED".equals(existingBooking.getRequestStatus())) {
@@ -64,7 +56,6 @@ public class BookingService {
             }
         }
 
-        // ✅ Fetch Room
         Room room = roomRepository.findById(roomNo).orElse(null);
         if (room == null || room.isStatus()) {
             return "Selected room is not available.";
@@ -82,9 +73,7 @@ public class BookingService {
         return "Booking request sent successfully!";
     }
 
-    /**
-     * ✅ Reject a booking.
-     */
+  
     @Transactional
     public boolean rejectBooking(Long bookingId) {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
@@ -97,9 +86,7 @@ public class BookingService {
         return false;
     }
 
-    /**
-     * ✅ Delete a booking.
-     */
+  
     @Transactional
     public boolean deleteBooking(Long bookingId) {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);

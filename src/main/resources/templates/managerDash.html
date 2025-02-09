@@ -7,105 +7,10 @@
     <title>Manager Dashboard</title>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/CSS/footer.css">
-    <link rel="stylesheet" href="/CSS/managerDash.css">
-    <link rel="stylesheet" href="/CSS/index.css">
+    <link rel="stylesheet" th:href="@{/CSS/footer.css}">
+    <link rel="stylesheet" th:href="@{/CSS/managerDash.css}">
+    <link rel="stylesheet" th:href="@{/CSS/index.css}">
     
-    <!-- Custom Styles to Improve Button and Table Effects -->
-    <style>
-        /* Add 3D Effect to Buttons */
-        .btn {
-            border-radius: 8px;
-            padding: 10px 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px); /* Lift the button */
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-
-        /* Ensure Table Looks 3D */
-        .table {
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15);
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .table th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-
-        .table td {
-            padding: 12px;
-            vertical-align: middle;
-        }
-
-        /* Hover effect for table rows */
-        .table tr:hover {
-            background-color: rgba(0, 123, 255, 0.1);
-        }
-
-        /* Table Row Styling */
-        .table tr {
-            transition: background-color 0.3s ease;
-        }
-
-        /* Show Alert for Error */
-        .alert {
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Footer Styling */
-        .footer {
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            background-color: #343a40;
-            padding: 20px;
-            text-align: center;
-            margin-top: 50px;
-            color: white;
-        }
-
-        .social-icons a {
-            margin: 0 10px;
-            font-size: 20px;
-        }
-
-        .content {
-            min-height: 100vh;
-            padding-bottom: 70px; /* Give some space at the bottom for the footer */
-        }
-    </style>
 </head>
 
 <body>
