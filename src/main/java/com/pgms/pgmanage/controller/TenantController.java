@@ -5,165 +5,84 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.pgms.pgmanage.entity.Booking;
-import com.pgms.pgmanage.entity.Room;
 import com.pgms.pgmanage.entity.Tenant;
-import com.pgms.pgmanage.repository.BookingRepository;
-import com.pgms.pgmanage.repository.RoomRepository;
-import com.pgms.pgmanage.repository.TenantRepository;
 import com.pgms.pgmanage.service.TenantService;
 
 import jakarta.servlet.http.HttpSession;
-import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/tenant")
 public class TenantController {
 
-	@Autowired
-	private RoomRepository roomRepository;
+    @Autowired
+    private TenantService tenantService;
 
-	@Autowired
-	private BookingRepository bookingRepository;
+    // ✅ Display Tenant Dashboard with Available Rooms
+    @GetMapping("/dashboard")
+    public String tenantDashboard(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInTenant") == null) {
+            return "redirect:/tenantlogin"; // Redirect if not logged in
+        }
 
-	@Autowired
-	private TenantRepository tenantRepository;
+        // ✅ Fetch Tenant Information
+        String tenantEmail = (String) session.getAttribute("loggedInTenant");
+        Tenant tenant = tenantService.getTenantByEmail(tenantEmail);
+        if (tenant == null) {
+            return "redirect:/tenantlogin";
+        }
 
-	@Autowired
-	private TenantService tenantService;
+        model.addAttribute("tenantUsername", tenant.getUsername());
 
-	// ✅ Display Tenant Dashboard with Available Rooms
-	@GetMapping("/dashboard")
-	public String tenantDashboard(HttpSession session, Model model) {
-		if (session.getAttribute("loggedInTenant") == null) {
-			return "redirect:/tenantlogin"; // Redirect if not logged in
-		}
+        // ✅ Fetch Available Rooms
+        model.addAttribute("rooms", tenantService.getAvailableRooms());
 
-		// ✅ Get Tenant Email from Session
-		String tenantEmail = (String) session.getAttribute("loggedInTenant");
-		Tenant tenant = tenantRepository.findByTMail(tenantEmail);
-		if (tenant == null) {
-			return "redirect:/tenantlogin"; // Redirect if tenant not found
-		}
+        // ✅ Fetch Approved Booking (if exists)
+        model.addAttribute("allocatedRoom", tenantService.getAllocatedRoomNumber(tenant.getId()));
 
-		model.addAttribute("tenantUsername", tenant.getUsername()); // Pass username to frontend
+        // ✅ Pass session messages to model
+        addSessionMessagesToModel(session, model);
 
-		// ✅ Fetch Available Rooms (Vacant Only)
-		List<Room> availableRooms = roomRepository.findByStatus(false); // false = vacant
-		model.addAttribute("rooms", availableRooms);
+        return "tenantDash"; // Load tenant dashboard
+    }
 
-		// ✅ Check if Tenant has an Approved Booking
-		Booking approvedBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
-		if (approvedBooking != null) {
-			model.addAttribute("allocatedRoom", approvedBooking.getRoom().getRoomNo()); // Pass allocated room to
-																						// frontend
-		}
+    // ✅ Book a Room (Delegating Logic to Service)
+    @PostMapping("/book-room/{roomNo}")
+    public String bookRoom(@PathVariable int roomNo, 
+                           @RequestParam("checkin") String checkinDate,
+                           @RequestParam("checkout") String checkoutDate, 
+                           HttpSession session, Model model) {
 
-		// ✅ Show rejection message (if any)
-		if (session.getAttribute("bookingRejectionMessage") != null) {
-			model.addAttribute("bookingRejectionMessage", session.getAttribute("bookingRejectionMessage"));
-			session.removeAttribute("bookingRejectionMessage"); // Remove after displaying
-		}
+        String tenantEmail = (String) session.getAttribute("loggedInTenant");
+        if (tenantEmail == null) {
+            return "redirect:/tenantlogin";
+        }
 
-		// ✅ Pass booking error messages if any
-		if (session.getAttribute("bookingError") != null) {
-			model.addAttribute("bookingError", session.getAttribute("bookingError"));
-			session.removeAttribute("bookingError"); // Remove after displaying
-		}
+        // ✅ Request booking through service
+        String bookingResponse = tenantService.requestBooking(tenantEmail, roomNo, checkinDate, checkoutDate);
 
-		// ✅ Success message for booking request
-		if (session.getAttribute("bookingSuccessMessage") != null) {
-			model.addAttribute("bookingSuccessMessage", session.getAttribute("bookingSuccessMessage"));
-			session.removeAttribute("bookingSuccessMessage"); // Remove after displaying
-		}
+        // ✅ Store response message in session
+        session.setAttribute("bookingMessage", bookingResponse);
 
-		return "tenantDash"; // Load tenant dashboard
-	}
+        return "redirect:/tenant/dashboard"; 
+    }
 
-	// ✅ Book a Room (Saving Booking Directly in Controller)
-	@PostMapping("/book-room/{roomNo}")
-	public String bookRoom(@PathVariable int roomNo, @RequestParam("checkin") String checkinDate,
-			@RequestParam("checkout") String checkoutDate, HttpSession session, Model model) {
+    // ✅ Handle Rejected Booking
+    @PostMapping("/reject-booking/{bookingId}")
+    public String rejectBooking(@PathVariable Long bookingId, HttpSession session) {
+        tenantService.rejectBooking(bookingId);
+        session.setAttribute("bookingRejectionMessage", "Your previous booking request was rejected. You can now request a new room.");
+        return "redirect:/tenant/dashboard";
+    }
 
-		// ✅ Ensure session contains logged-in tenant
-		String tenantEmail = (String) session.getAttribute("loggedInTenant");
-		if (tenantEmail == null) {
-			return "redirect:/tenantlogin"; // Redirect if not logged in
-		}
-
-		// ✅ Fetch Tenant
-		Tenant tenant = tenantRepository.findByTMail(tenantEmail);
-		if (tenant == null) {
-			return "redirect:/tenantlogin"; // Redirect if tenant not found
-		}
-
-		// ✅ Check if the tenant already has an approved booking
-//        Booking existingBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
-//        if (existingBooking != null) {
-//            model.addAttribute("error", "You already have an approved booking. You can’t request a new room until your current booking is resolved.");
-//            return tenantDashboard(session, model); // ✅ Return the tenant dashboard with the error message
-//        }
-
-//		String bookingMessage = tenantService.bookRoom(roomNo, checkinDate, checkoutDate, tenant);
-//		if (bookingMessage.contains("success")) {
-//			session.setAttribute("bookingSuccessMessage", bookingMessage);
-//			return "redirect:/tenant/dashboard"; // Redirect to dashboard
-//		} else {
-//			model.addAttribute("error", bookingMessage);
-//			return "tenantDash"; // ✅ Show error message
-//		}
-
-		// ✅ Prevent multiple active bookings
-		boolean hasActiveBooking = tenantService.hasActiveBooking(tenant.getId());
-		if (hasActiveBooking) {
-			model.addAttribute("error", "You already have an active booking (Pending/Approved).");
-			return "tenantDash"; // ✅ Show error message on dashboard
-		}
-
-		// ✅ Fetch Room
-		Room room = roomRepository.findById(roomNo).orElse(null);
-		if (room == null || room.isStatus()) {
-			model.addAttribute("error", "Selected room is not available.");
-			return tenantDashboard(session, model); // ✅ Return the tenant dashboard with the error message
-		}
-
-		// ✅ Save Booking (Request Status: PENDING)
-		createBooking(checkinDate, checkoutDate, tenant, room);
-
-		// ✅ Set success message for booking request
-		session.setAttribute("bookingSuccessMessage", "Booking request sent successfully!");
-
-		return "redirect:/tenant/dashboard"; // Redirect to the tenant dashboard after booking
-	}
-
-	private void createBooking(String checkinDate, String checkoutDate, Tenant tenant, Room room) {
-		Booking booking = new Booking();
-		booking.setTenant(tenant);
-		booking.setRoom(room);
-		booking.setCheckinDate(LocalDate.parse(checkinDate));
-		booking.setCheckoutDate(LocalDate.parse(checkoutDate));
-		booking.setRequestStatus("PENDING");
-
-		bookingRepository.save(booking);
-	}
-
-	// ✅ Handle Rejected Booking
-	@PostMapping("/reject-booking/{bookingId}")
-	public String rejectBooking(@PathVariable Long bookingId, HttpSession session) {
-		// Fetch booking by ID
-		Booking booking = bookingRepository.findById(bookingId).orElse(null);
-		if (booking != null) {
-			// Change the booking status to REJECTED
-			booking.setRequestStatus("REJECTED");
-			bookingRepository.save(booking);
-
-			// Set rejection message for tenant dashboard
-			session.setAttribute("bookingRejectionMessage",
-					"Your previous booking request was rejected. You can now request a new room.");
-		}
-
-		return "redirect:/tenant/dashboard"; // Redirect back to the tenant dashboard
-	}
-
+    // ✅ Utility Method: Transfer Session Messages to Model
+    private void addSessionMessagesToModel(HttpSession session, Model model) {
+        if (session.getAttribute("bookingMessage") != null) {
+            model.addAttribute("bookingMessage", session.getAttribute("bookingMessage"));
+            session.removeAttribute("bookingMessage");
+        }
+        if (session.getAttribute("bookingRejectionMessage") != null) {
+            model.addAttribute("bookingRejectionMessage", session.getAttribute("bookingRejectionMessage"));
+            session.removeAttribute("bookingRejectionMessage");
+        }
+    }
 }

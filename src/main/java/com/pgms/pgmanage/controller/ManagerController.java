@@ -138,13 +138,13 @@ public class ManagerController {
 	    try {
 	        // ✅ Call service to remove the room and handle associated bookings
 	        managerService.removeRoom(roomNo);
-	        redirectAttributes.addFlashAttribute("message", "Room and associated bookings removed successfully!");
+	        redirectAttributes.addFlashAttribute("message", "Room removed successfully!");
 	        
 	    } catch (IllegalStateException e) { // ✅ Handle occupied room case
 	        redirectAttributes.addFlashAttribute("error", "You cannot delete this room as it is occupied by a tenant.");
 	        
 	    } catch (Exception e) { // ✅ Handle other exceptions
-	        redirectAttributes.addFlashAttribute("error", "An error occurred while deleting the room.");
+	        redirectAttributes.addFlashAttribute("error", e.getMessage());
 	    }
 	    return "redirect:/manager/manage-rooms"; // Redirect back to manage rooms page
 	}
