@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	let rowsPerPage = 3; // Show only 3 bookings per page
+	let rowsPerPage = 3;
 	let rows = $("#allBookingsTable tbody tr");
 	let totalRows = rows.length;
 	let currentPage = 1;
@@ -33,7 +33,6 @@ $(document).ready(function() {
 		}
 	});
 
-	// Initialize table view
 	showPage(currentPage);
 	updateButtons();
 });

@@ -11,10 +11,10 @@ public interface TenantRepository extends JpaRepository<Tenant, Long> {
     Tenant findByTMail(String tMail);  
 
     // ✅ Find tenant by username
-    Tenant findByUsername(String username);
+//    Tenant findByUsername(String username);
 
     // ✅ Find tenant by phone number
-    Tenant findByPhNumber(Long phNumber);
+//    Tenant findByPhNumber(Long phNumber);
 
     // ✅ Check if email exists (for validation during registration)
     boolean existsByTMail(String tMail);

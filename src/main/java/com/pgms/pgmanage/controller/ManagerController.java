@@ -2,6 +2,8 @@ package com.pgms.pgmanage.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,133 +26,141 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/manager")
 public class ManagerController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ManagerController.class);
+
 	@Autowired
 	private ManagerService managerService;
 
-	// ✅ Manager Login Page
 	@GetMapping("/login")
 	public String managerLoginPage() {
-		return "mngrLogin"; // Thymeleaf manager login page
+		logger.info("Manager login page accessed");
+		return "mngrLogin";
 	}
 
-	// ✅ Process Manager Login
 	@PostMapping("/login")
 	public String loginManager(@RequestParam String email, @RequestParam String password, HttpSession session,
 			Model model) {
+		logger.info("Manager login attempt with email: {}", email);
+
 		Manager manager = managerService.validateManager(email, password);
 
 		if (manager == null) {
+			logger.warn("Failed login attempt for email: {}", email);
 			model.addAttribute("error", "Invalid email or password. Please try again.");
-			return "mngrLogin"; // Stay on login page if credentials are incorrect
+			return "mngrLogin";
 		}
 
-		// Store manager details in session
 		session.setAttribute("loggedInManager", manager.getEmail());
 		session.setAttribute("managerName", manager.getManagerName());
 
+		logger.info("Manager login successful: {}", email);
 		return "redirect:/manager/dashboard";
 	}
 
-	// ✅ Manager Dashboard - Fetch Pending Bookings
 	@GetMapping("/dashboard")
 	public String managerDashboard(HttpSession session, Model model) {
 		if (session.getAttribute("loggedInManager") == null) {
-			return "redirect:/manager/login"; // Redirect to login if not logged in
+			logger.warn("Unauthorized access attempt to manager dashboard");
+			return "redirect:/manager/login";
 		}
 
-		// ✅ Fetch only PENDING bookings (so rejected ones disappear)
+		logger.info("Manager accessing dashboard");
+
 		List<Booking> pendingBookings = managerService.getPendingBookings();
 		model.addAttribute("bookings", pendingBookings);
 
-		// ✅ Fetch all tenants
 		List<Tenant> tenants = managerService.getAllTenants();
 		model.addAttribute("tenants", tenants);
-		
+
 		List<Booking> allBookings = managerService.getAllBookings();
-        model.addAttribute("allBookings", allBookings);
+		model.addAttribute("allBookings", allBookings);
 
 		model.addAttribute("managerName", session.getAttribute("managerName"));
+
 		return "managerDash";
 	}
 
-	// ✅ Approve Booking
 	@PostMapping("/approve-booking/{bookingId}")
 	public String approveBooking(@PathVariable Long bookingId, Model model) {
 		try {
+			logger.info("Manager approving booking ID: {}", bookingId);
 			managerService.approveBooking(bookingId);
 		} catch (IllegalStateException e) {
+			logger.warn("Failed to approve booking ID: {} - Reason: {}", bookingId, e.getMessage());
 			model.addAttribute("error", e.getMessage());
-			return "managerDash"; // Return to dashboard with error message
+			return "managerDash";
 		}
 		return "redirect:/manager/dashboard";
 	}
 
-	// ✅ Reject Booking
 	@PostMapping("/reject-booking/{bookingId}")
 	public String rejectBooking(@PathVariable Long bookingId) {
+		logger.info("Manager rejecting booking ID: {}", bookingId);
 		managerService.rejectBooking(bookingId);
 		return "redirect:/manager/dashboard";
 	}
 
-	// ✅ Logout Manager
 	@GetMapping("/logout")
 	public String logoutManager(HttpSession session) {
-		session.invalidate(); // Clear session
+		String managerEmail = (String) session.getAttribute("loggedInManager");
+
+		if (managerEmail != null) {
+			logger.info("Manager logged out: {}", managerEmail);
+		} else {
+			logger.info("Logout attempted, but no manager was logged in");
+		}
+
+		session.invalidate();
 		return "redirect:/manager/login";
 	}
 
-	// ✅ Manage Rooms Page
 	@GetMapping("/manage-rooms")
 	public String manageRooms(HttpSession session, Model model) {
 		if (session.getAttribute("loggedInManager") == null) {
-			return "redirect:/manager/login"; // Redirect if not logged in
+			logger.warn("Unauthorized access attempt to Manage Rooms page");
+			return "redirect:/manager/login";
 		}
+
+		logger.info("Manager accessing room management page");
 
 		List<Room> rooms = managerService.getAllRooms();
 		model.addAttribute("rooms", rooms);
 
-		return "manageRooms"; // Ensure Thymeleaf finds `manageRooms.html`
+		return "manageRooms";
 	}
 
-	// ✅ Add Room
 	@PostMapping("/add-room")
 	public String addRoom(@RequestParam int roomNo, @RequestParam boolean type, RedirectAttributes redirectAttributes) {
-	    try {
-	        // Call the service to add the room
-	        managerService.addRoom(roomNo, type);
-	        redirectAttributes.addFlashAttribute("message", "Room added successfully!");
-	    } catch (IllegalArgumentException e) {
-	        // Handle the case where the room number is negative or invalid
-	        redirectAttributes.addFlashAttribute("error", e.getMessage());
-	    } catch (IllegalStateException e) {
-	        // Handle the case where the room number already exists
-	        redirectAttributes.addFlashAttribute("error", e.getMessage());
-	    } catch (Exception e) {
-	        // Catch any other unexpected exceptions
-	        redirectAttributes.addFlashAttribute("error", "An unexpected error occurred: " + e.getMessage());
-	    }
-	    return "redirect:/manager/manage-rooms";  // Redirect back to the Manage Rooms page
+		try {
+			logger.info("Adding new room: Room No {}, Type: {}", roomNo, type ? "AC" : "Non-AC");
+			managerService.addRoom(roomNo, type);
+			redirectAttributes.addFlashAttribute("message", "Room added successfully!");
+		} catch (IllegalArgumentException e) {
+			logger.warn("Failed to add room: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("error", e.getMessage());
+		} catch (IllegalStateException e) {
+			logger.warn("Room already exists: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("error", e.getMessage());
+		} catch (Exception e) {
+			logger.error("Unexpected error while adding room: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("error", "An unexpected error occurred: " + e.getMessage());
+		}
+		return "redirect:/manager/manage-rooms";
 	}
 
-
-
-
-	// ✅ Remove Room and display success message
 	@PostMapping("/remove-room")
 	public String removeRoom(@RequestParam int roomNo, RedirectAttributes redirectAttributes) {
-	    try {
-	        // ✅ Call service to remove the room and handle associated bookings
-	        managerService.removeRoom(roomNo);
-	        redirectAttributes.addFlashAttribute("message", "Room removed successfully!");
-	        
-	    } catch (IllegalStateException e) { // ✅ Handle occupied room case
-	        redirectAttributes.addFlashAttribute("error", "You cannot delete this room as it is occupied by a tenant.");
-	        
-	    } catch (Exception e) { // ✅ Handle other exceptions
-	        redirectAttributes.addFlashAttribute("error", e.getMessage());
-	    }
-	    return "redirect:/manager/manage-rooms"; // Redirect back to manage rooms page
+		try {
+			logger.info("Attempting to remove room: Room No {}", roomNo);
+			managerService.removeRoom(roomNo);
+			redirectAttributes.addFlashAttribute("message", "Room removed successfully!");
+		} catch (IllegalStateException e) {
+			logger.warn("Cannot remove room {}: Room is occupied", roomNo);
+			redirectAttributes.addFlashAttribute("error", "You cannot delete this room as it is occupied by a tenant.");
+		} catch (Exception e) {
+			logger.error("Unexpected error while removing room: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("error", e.getMessage());
+		}
+		return "redirect:/manager/manage-rooms";
 	}
-
-
 }

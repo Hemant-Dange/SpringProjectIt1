@@ -1,99 +1,60 @@
 package com.pgms.pgmanage.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.pgms.pgmanage.entity.Booking;
-import com.pgms.pgmanage.entity.Tenant;
-import com.pgms.pgmanage.entity.Room;
 import com.pgms.pgmanage.repository.BookingRepository;
-import com.pgms.pgmanage.repository.TenantRepository;
-import com.pgms.pgmanage.repository.RoomRepository;
 
 @Service
 public class BookingService {
 
-    @Autowired
-    private BookingRepository bookingRepository;
+	private static final Logger logger = LoggerFactory.getLogger(BookingService.class);
 
-    @Autowired
-    private TenantRepository tenantRepository;
+	@Autowired
+	private BookingRepository bookingRepository;
 
-    @Autowired
-    private RoomRepository roomRepository;
+	public boolean hasActiveBooking(Long tenantId) {
+		logger.info("Checking if tenant ID {} has an active booking...", tenantId);
+		boolean exists = bookingRepository.existsByTenantIdAndRequestStatusIn(tenantId, List.of("PENDING", "APPROVED"));
 
-    
-    public boolean hasActiveBooking(Long tenantId) {
-        return bookingRepository.existsByTenantIdAndRequestStatusIn(
-            tenantId, List.of("PENDING", "APPROVED")
-        );
-    }
+		if (exists) {
+			logger.info("Tenant ID {} has an active booking.", tenantId);
+		} else {
+			logger.info("Tenant ID {} has no active bookings.", tenantId);
+		}
+		return exists;
+	}
 
-    
-    public Booking getApprovedBooking(Long tenantId) {
-        return bookingRepository.findByTenantIdAndRequestStatus(tenantId, "APPROVED");
-    }
+	public Booking getApprovedBooking(Long tenantId) {
+		logger.info("Fetching approved booking for tenant ID {}...", tenantId);
+		Booking approvedBooking = bookingRepository.findByTenantIdAndRequestStatus(tenantId, "APPROVED");
 
-    @Transactional
-    public String requestBooking(Long tenantId, int roomNo, String checkinDate, String checkoutDate) {
-        Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
-        if (tenantOptional.isEmpty()) {
-            return "Tenant not found!";
-        }
-        Tenant tenant = tenantOptional.get();
+		if (approvedBooking != null) {
+			logger.info("Approved booking found for tenant ID {}: Booking ID {}", tenantId, approvedBooking.getId());
+		} else {
+			logger.info("No approved booking found for tenant ID {}.", tenantId);
+		}
 
-        Booking existingBooking = bookingRepository.findByTenantId(tenantId);
-        if (existingBooking != null) {
-            if ("APPROVED".equals(existingBooking.getRequestStatus())) {
-                return "You already have an active booking. You can’t request a new room.";
-            } else if ("REJECTED".equals(existingBooking.getRequestStatus())) {
-                bookingRepository.delete(existingBooking); // ✅ Remove rejected booking before creating a new one
-            }
-        }
+		return approvedBooking;
+	}
 
-        Room room = roomRepository.findById(roomNo).orElse(null);
-        if (room == null || room.isStatus()) {
-            return "Selected room is not available.";
-        }
+	public boolean deleteBooking(Long bookingId) {
+		logger.info("Attempting to delete booking ID {}...", bookingId);
+		Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
 
-        // ✅ Create and save new booking request (PENDING)
-        Booking booking = new Booking();
-        booking.setTenant(tenant);
-        booking.setRoom(room);
-        booking.setCheckinDate(LocalDate.parse(checkinDate));
-        booking.setCheckoutDate(LocalDate.parse(checkoutDate));
-        booking.setRequestStatus("PENDING");
+		if (bookingOptional.isPresent()) {
+			bookingRepository.delete(bookingOptional.get());
+			logger.info("Successfully deleted booking ID {}.", bookingId);
+			return true;
+		}
 
-        bookingRepository.save(booking);
-        return "Booking request sent successfully!";
-    }
-
-  
-    @Transactional
-    public boolean rejectBooking(Long bookingId) {
-        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
-        if (bookingOptional.isPresent()) {
-            Booking booking = bookingOptional.get();
-            booking.setRequestStatus("REJECTED");
-            bookingRepository.save(booking);
-            return true;
-        }
-        return false;
-    }
-
-  
-    @Transactional
-    public boolean deleteBooking(Long bookingId) {
-        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
-        if (bookingOptional.isPresent()) {
-            bookingRepository.delete(bookingOptional.get());
-            return true;
-        }
-        return false;
-    }
+		logger.warn("Booking ID {} not found. Cannot delete.", bookingId);
+		return false;
+	}
 }

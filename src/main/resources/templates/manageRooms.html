@@ -10,8 +10,6 @@
     <link rel="stylesheet" th:href="@{/CSS/login.css}">
     <link rel="stylesheet" th:href="@{/CSS/index.css}">
 	<link rel="stylesheet" th:href="@{/CSS/mangageRooms.css}">
-    
-    <!-- Font Awesome for social icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 </head>
@@ -41,13 +39,13 @@
         <h2 class="text-center">Manage Rooms</h2>
         <p class="text-center">View and manage rooms below:</p>
 
-        <!-- Display success or error message -->
+        <!-- Shows success or error message -->
 		<div th:if="${message}" class="alert alert-success">
-		    <p th:text="${message}"></p> <!-- Display success message -->
+		    <p th:text="${message}"></p> 
 		</div>
 
 		<div th:if="${error}" class="alert alert-danger">
-		    <p th:text="${error}"></p> <!-- Display error message -->
+		    <p th:text="${error}"></p> 
 		</div>
 
         <!-- Room List -->
@@ -69,7 +67,7 @@
             </tbody>
         </table>
 
-        <!-- Add Room Section with 3D form effect -->
+        <!-- Add Rooms -->
         <h3 class="mt-5">Add a New Room</h3>
         <div class="form-container">
             <form th:action="@{/manager/add-room}" method="post">
@@ -88,7 +86,7 @@
             </form>
         </div>
 
-        <!-- Remove Room Section with 3D form effect -->
+        <!-- Remove Rooms -->
         <h3 class="mt-5">Remove a Room</h3>
         <div class="form-container">
             <form th:action="@{/manager/remove-room}" method="post">
@@ -101,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
     <footer class="footer">
         <div class="social-icons">
             <a href="#" class="mx-2"><i class="fab fa-facebook-f"></i></a>

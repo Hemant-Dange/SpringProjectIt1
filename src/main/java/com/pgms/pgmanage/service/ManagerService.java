@@ -3,6 +3,8 @@ package com.pgms.pgmanage.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import com.pgms.pgmanage.repository.TenantRepository;
 @Service
 public class ManagerService {
 
+	private static final Logger logger = LoggerFactory.getLogger(ManagerService.class);
+
 	@Autowired
 	private ManagerRepository managerRepository;
 
@@ -31,116 +35,112 @@ public class ManagerService {
 	@Autowired
 	private TenantRepository tenantRepository;
 
-	// ✅ Validate Manager Credentials
 	public Manager validateManager(String email, String password) {
+		logger.info("Manager login attempt: {}", email);
 		Manager manager = managerRepository.findByEmail(email);
-		return (manager != null && manager.getPassword().equals(password)) ? manager : null;
+		if (manager != null && manager.getPassword().equals(password)) {
+			logger.info("Manager login successful: {}", email);
+			return manager;
+		}
+		logger.warn("Manager login failed for email: {}", email);
+		return null;
 	}
 
-	// ✅ Fetch all rooms for management
 	public List<Room> getAllRooms() {
+		logger.info("Fetching all rooms for management.");
 		return roomRepository.findAll();
 	}
 
-	// ✅ Fetch all tenants
 	public List<Tenant> getAllTenants() {
+		logger.info("Fetching all tenants.");
 		return tenantRepository.findAll();
 	}
 
-	// ✅ Fetch only PENDING bookings (So REJECTED ones disappear)
 	public List<Booking> getPendingBookings() {
+		logger.info("Fetching pending bookings.");
 		return bookingRepository.findByRequestStatus("PENDING");
 	}
-	
-	public List<Booking> getAllBookings() {
-        return bookingRepository.findAllByOrderByIdDesc(); // ✅ Fetch bookings in reverse order
-    }
 
-	// ✅ Approve booking & update room status (Ensures tenant has only one booking)
+	public List<Booking> getAllBookings() {
+		logger.info("Fetching all bookings in descending order.");
+		return bookingRepository.findAllByOrderByIdDesc();
+	}
+
 	public void approveBooking(Long bookingId) {
+		logger.info("Attempting to approve booking with ID: {}", bookingId);
 		Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
 		if (optionalBooking.isPresent()) {
 			Booking booking = optionalBooking.get();
 			Tenant tenant = booking.getTenant();
 			Room room = booking.getRoom();
 
-			// 🚀 Check if tenant already has an approved booking
 			if (bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED") != null) {
+				logger.warn("Tenant {} already has an approved booking!", tenant.getUsername());
 				throw new IllegalStateException("Tenant already has an approved booking!");
 			}
 
-			// ✅ Approve booking and update status
 			booking.setRequestStatus("APPROVED");
 			bookingRepository.save(booking);
+			logger.info("Booking ID: {} approved for Tenant: {}", bookingId, tenant.getUsername());
 
-			// ✅ Update room status to occupied
 			room.setStatus(true);
 			roomRepository.save(room);
+			logger.info("Room {} marked as occupied.", room.getRoomNo());
+		} else {
+			logger.warn("Booking ID: {} not found for approval.", bookingId);
 		}
 	}
 
 	public void rejectBooking(Long bookingId) {
+		logger.info("Attempting to reject booking with ID: {}", bookingId);
 		Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
 		if (optionalBooking.isPresent()) {
 			Booking booking = optionalBooking.get();
-
 			booking.setRequestStatus("REJECTED");
 			bookingRepository.save(booking);
+			logger.info("Booking ID: {} rejected.", bookingId);
+		} else {
+			logger.warn("Booking ID: {} not found for rejection.", bookingId);
 		}
 	}
 
-	public void deleteTenant(Long tenantId) {
-		Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
-		if (tenantOptional.isPresent()) {
-			Tenant tenant = tenantOptional.get();
-
-			Booking activeBooking = bookingRepository.findByTenantIdAndRequestStatus(tenant.getId(), "APPROVED");
-			if (activeBooking != null) {
-				Room room = activeBooking.getRoom();
-				room.setStatus(false); // Make room vacant
-				roomRepository.save(room);
-			}
-
-			tenantRepository.delete(tenant);
-		}
-	}
-
-	// ✅ Add a new room
 	public void addRoom(int roomNo, boolean type) {
-		// Check if the room number is negative
+		logger.info("Attempting to add Room No: {}, Type: {}", roomNo, type ? "AC" : "Non-AC");
+
 		if (roomNo < 1) {
+			logger.warn("Invalid room number: {}", roomNo);
 			throw new IllegalArgumentException("Room number must be a positive number!");
 		}
 
-		// Check if the room already exists
 		if (roomRepository.existsById(roomNo)) {
+			logger.warn("Room No: {} already exists!", roomNo);
 			throw new IllegalStateException("Room number " + roomNo + " already exists!");
 		}
 
-		// Create and save the new room if valid
-		roomRepository.save(new Room(roomNo, type, false)); // Default status is Vacant
+		roomRepository.save(new Room(roomNo, type, false)); 
+		logger.info("Room No: {} successfully added.", roomNo);
 	}
 
 	@Transactional
 	public void removeRoom(int roomNo) {
-
+		logger.info("Attempting to remove Room No: {}", roomNo);
 		Room room = roomRepository.findById(roomNo).orElse(null);
 		if (room == null) {
+			logger.warn("Room No: {} not found for deletion.", roomNo);
 			throw new IllegalArgumentException("Room not found");
 		}
 
-		// ✅ Step 1: Check if room has any "APPROVED" bookings (i.e., occupied)
 		boolean isOccupied = bookingRepository.existsByRoomAndRequestStatus(room, "APPROVED");
 		if (isOccupied) {
+			logger.warn("Cannot delete Room No: {} as it is occupied.", roomNo);
 			throw new IllegalStateException("Cannot delete room as it is occupied by a tenant.");
 		}
 
-		// ✅ Step 2: Find and delete all bookings for the room
 		List<Booking> bookings = bookingRepository.findByRoom(room);
 		bookingRepository.deleteAll(bookings);
+		logger.info("Deleted all bookings associated with Room No: {}", roomNo);
 
-		// ✅ Step 3: Delete the room
 		roomRepository.delete(room);
+		logger.info("Room No: {} successfully removed.", roomNo);
 	}
-
 }

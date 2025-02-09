@@ -1,5 +1,7 @@
 package com.pgms.pgmanage.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,39 +14,49 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
-    
-    @Autowired
-    private TenantService tenantService;
 
-    // ✅ Tenant Login Page
-    @GetMapping("/tenantlogin")
-    public String getTenantLogin(Model model) {
-        model.addAttribute("tenantDto", new TenantDto());
-        return "tenantLogin"; // Thymeleaf login page
-    }
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    // ✅ Process Tenant Login
-    @PostMapping("/tenantlogin")
-    public String tenantLogin(@ModelAttribute TenantDto tenantDto, Model model, HttpSession session) {
-        // ✅ Authenticate Tenant
-        TenantDto authenticatedTenant = tenantService.authenticateTenant(tenantDto.gettMail(), tenantDto.getPassword());
+	@Autowired
+	private TenantService tenantService;
 
-        if (authenticatedTenant == null) {
-            model.addAttribute("error", "Invalid email or password. Please try again.");
-            return "tenantLogin"; // Stay on login page if credentials are incorrect
-        }
+	@GetMapping("/tenantlogin")
+	public String getTenantLogin(Model model) {
+		logger.info("Tenant login page accessed");
+		model.addAttribute("tenantDto", new TenantDto());
+		return "tenantLogin";
+	}
 
-        // ✅ Store tenant information in session
-        session.setAttribute("loggedInTenant", authenticatedTenant.gettMail());
-        session.setAttribute("tenantUsername", authenticatedTenant.getUsername());
+	@PostMapping("/tenantlogin")
+	public String tenantLogin(@ModelAttribute TenantDto tenantDto, Model model, HttpSession session) {
+		logger.info("Tenant login attempt with email: {}", tenantDto.gettMail());
 
-        return "redirect:/tenant/dashboard"; // Redirect to dashboard on successful login
-    }
+		TenantDto authenticatedTenant = tenantService.authenticateTenant(tenantDto.gettMail(), tenantDto.getPassword());
 
-    // ✅ Tenant Logout
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate(); // Clear session
-        return "redirect:/tenantlogin"; // Redirect after logout
-    }
+		if (authenticatedTenant == null) {
+			logger.warn("Failed login attempt for email: {}", tenantDto.gettMail());
+			model.addAttribute("error", "Invalid email or password. Please try again.");
+			return "tenantLogin";
+		}
+
+		session.setAttribute("loggedInTenant", authenticatedTenant.gettMail());
+		session.setAttribute("tenantUsername", authenticatedTenant.getUsername());
+
+		logger.info("Tenant login successful: {}", authenticatedTenant.gettMail());
+		return "redirect:/tenant/dashboard";
+	}
+
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		String tenantEmail = (String) session.getAttribute("loggedInTenant");
+
+		if (tenantEmail != null) {
+			logger.info("Tenant logged out: {}", tenantEmail);
+		} else {
+			logger.info("Logout attempted, but no tenant was logged in");
+		}
+
+		session.invalidate();
+		return "redirect:/tenantlogin";
+	}
 }

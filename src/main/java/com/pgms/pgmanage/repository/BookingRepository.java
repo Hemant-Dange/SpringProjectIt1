@@ -13,7 +13,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByRequestStatus(String status);
 
-    Booking findByTenantId(Long tenantId);  
+//    Booking findByTenantId(Long tenantId);  
 
     Booking findByTenantIdAndRequestStatus(Long tenantId, String requestStatus);
     
